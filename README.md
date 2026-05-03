@@ -5,7 +5,10 @@
 ## About
 
 **ForrAI** is a neural network that I created just for a test, because I didn't understand how does AIs work.
+
 Ispired by : https://habr.com/ru/companies/piter/articles/1021738/
+
+Original code : https://github.com/githubharald/cpp_mnist
 
 ---
 
