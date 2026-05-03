@@ -77,11 +77,13 @@
     <None Include="source_from_artickle.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ForrAI.cpp" />
+    <ClCompile Include="core.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RegressionModel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ForrAI.hpp" />
+    <ClInclude Include="core.hpp" />
+    <ClInclude Include="RegressionModel.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

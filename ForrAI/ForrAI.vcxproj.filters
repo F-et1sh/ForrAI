@@ -5,9 +5,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ForrAI.cpp" />
+    <ClCompile Include="core.cpp" />
+    <ClCompile Include="RegressionModel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ForrAI.hpp" />
+    <ClInclude Include="core.hpp" />
+    <ClInclude Include="RegressionModel.hpp" />
   </ItemGroup>
 </Project>

@@ -43,10 +43,12 @@ namespace fa {
         std::vector<float_t> weight{};
         std::vector<float_t> grad_weight{};
 
-        Unit(bool has_activation, size_t input_count) : has_activation(has_activation), weight(random_weight(input_count)) {}
+        Unit(size_t input_count, bool has_activation) : weight(random_weight(input_count)), has_activation(has_activation) {}
         explicit Unit(float_t value) : value(value) {}
 
         ~Unit() = default;
     };
+
+    using Layer = std::vector<Unit>;
 
 } // namespace fa
