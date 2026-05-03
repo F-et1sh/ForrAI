@@ -74,7 +74,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="source_from_artickle.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ForrAI.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ForrAI.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
