@@ -81,14 +81,14 @@ void fa::RegressionModel::backward(float_t error_signal) {
     }
 }
 
-void fa::RegressionModel::step(float_t lr) {
+void fa::RegressionModel::step(float_t learning_rate) {
     for (size_t i = 1; i < m_Layers.size(); i++) {
         Layer& current_layer = m_Layers[i];
         for (Unit& unit : current_layer) {
             for (size_t j = 0; j < unit.weight.size(); j++) {
-                unit.weight[j] -= lr * unit.grad_weight[j];
+                unit.weight[j] -= learning_rate * unit.grad_weight[j];
             }
-            unit.bias -= lr * unit.grad_bias;
+            unit.bias -= learning_rate * unit.grad_bias;
         }
     }
 }
