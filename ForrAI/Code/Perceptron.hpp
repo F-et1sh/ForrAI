@@ -1,6 +1,7 @@
 #pragma once
 #include <assert.h>
 #include <span>
+#include <array>
 #include <vector>
 #include <random>
 
@@ -64,6 +65,51 @@ namespace fa {
             return result;
         }
 
+        void backward(const std::array<neuron_value_t, 10>& error_signal) {
+            auto last_layer_deltas = this->GetLayerDeltas(m_LayersTopology.back());
+
+            for (std::size_t i = 0; i < error_signal.size(); i++)
+                last_layer_deltas[i] = error_signal[i];
+
+            for (std::size_t i = m_LayersTopology.size() - 1; i > 0; i--) {
+                const auto& this_layer_topology = m_LayersTopology[i];
+                const auto& past_layer_topology = m_LayersTopology[i - 1];
+
+                auto this_layer_values      = this->GetLayerValues(this_layer_topology);
+                auto this_layer_deltas      = this->GetLayerDeltas(this_layer_topology);
+                auto this_layer_grad_biases = this->GetLayerGradBiases(this_layer_topology);
+                auto past_layer_values      = this->GetLayerValues(past_layer_topology);
+
+                if (i < m_LayersTopology.size() - 1) {
+                    const auto& next_layer_topology = m_LayersTopology[i + 1];
+                    auto        next_layer_deltas   = this->GetLayerDeltas(next_layer_topology);
+
+                    for (std::size_t j = 0; j < this_layer_topology.values_count; j++) {
+                        neuron_value_t error_sum{};
+
+                        for (std::size_t k = 0; k < next_layer_topology.values_count; k++) {
+                            auto next_weights = this->GetNeuronWeights(next_layer_topology, this_layer_topology, k);
+                            error_sum += next_layer_deltas[k] * next_weights[j];
+                        }
+
+                        this_layer_deltas[j] = (this_layer_values[j] > 0) ? error_sum : 0;
+                    }
+                }
+
+                for (std::size_t j = 0; j < this_layer_topology.values_count; j++) {
+                    auto grad_weights = GetNeuronGradWeights(this_layer_topology, past_layer_topology, j);
+
+                    for (std::size_t k = 0; k < past_layer_topology.values_count; k++) {
+                        grad_weights[k] += this_layer_deltas[j] * past_layer_values[k];
+                    }
+
+                    this_layer_grad_biases[j] = this_layer_deltas[j];
+                }
+            }
+        }
+
+
+
     private:
         void create_layer(std::size_t neurons_count);
         void randomly_initialize_weight(container_t<neuron_value_t>& dst, std::size_t elements_count);
@@ -98,6 +144,13 @@ namespace fa {
                                                    std::size_t  neuron_index) {
             std::size_t offset = this_layer_topology.weights_start + (neuron_index * past_layer_topology.values_count);
             return { &m_Weights[offset], past_layer_topology.values_count };
+        }
+
+        std::span<neuron_value_t> GetNeuronGradWeights(const Layer& this_layer_topology,
+                                                       const Layer& past_layer_topology,
+                                                       std::size_t  neuron_index) {
+            std::size_t offset = this_layer_topology.weights_start + (neuron_index * past_layer_topology.values_count);
+            return { &m_GradWeights[offset], past_layer_topology.values_count };
         }
 
     private:
