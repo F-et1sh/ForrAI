@@ -8,10 +8,9 @@
 namespace fa {
     using float_t = float;
 
-    // an MNIST sample holding the image ( 28*28 float values ) and a label ( 0 or 1 )
     struct Sample {
-        std::vector<float> image{};
-        float              target{};
+        std::vector<float_t> image{};
+        float                target{};
 
         Sample()  = default;
         ~Sample() = default;

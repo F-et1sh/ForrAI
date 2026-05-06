@@ -51,7 +51,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)\ThirdParty\mnist\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Code;$(SolutionDir)\ThirdParty\mnist\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -71,7 +71,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)\ThirdParty\mnist\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Code;$(SolutionDir)\ThirdParty\mnist\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -82,16 +82,19 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="source_from_artickle.cpp" />
+    <None Include="sources-from-artickle\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="core.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="RegressionModel.cpp" />
+    <ClCompile Include="Code\Perceptron.cpp" />
+    <None Include="old\core.cpp" />
+    <ClCompile Include="Code\main.cpp" />
+    <None Include="old\main.cpp" />
+    <None Include="old\RegressionModel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="core.hpp" />
-    <ClInclude Include="RegressionModel.hpp" />
+    <None Include="old\core.hpp" />
+    <ClInclude Include="Code\Perceptron.hpp" />
+    <None Include="old\RegressionModel.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,15 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <None Include="source_from_artickle.cpp" />
+    <None Include="sources-from-artickle\main.cpp" />
+    <None Include="old\core.cpp" />
+    <None Include="old\core.hpp" />
+    <None Include="old\main.cpp" />
+    <None Include="old\RegressionModel.cpp" />
+    <None Include="old\RegressionModel.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="core.cpp" />
-    <ClCompile Include="RegressionModel.cpp" />
+    <ClCompile Include="Code\main.cpp" />
+    <ClCompile Include="Code\Perceptron.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="core.hpp" />
-    <ClInclude Include="RegressionModel.hpp" />
+    <ClInclude Include="Code\Perceptron.hpp" />
   </ItemGroup>
 </Project>
