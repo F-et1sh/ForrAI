@@ -15,19 +15,19 @@ fa::Perceptron::Perceptron(std::size_t input_layer_neurons_count,
 }
 
 void fa::Perceptron::create_layer(std::size_t neurons_count) {
-    std::size_t last_layer_neuron_count = m_Topology.empty() ? 0 : m_Topology.back().values_count;
-    std::size_t weights_to_add          = neurons_count * last_layer_neuron_count;
+    std::size_t past_layer_neurons_count = m_LayersTopology.empty() ? 0 : m_LayersTopology.back().values_count;
+    std::size_t weights_to_add           = neurons_count * past_layer_neurons_count;
 
-    auto& new_layer         = m_Topology.emplace_back();
+    auto& new_layer         = m_LayersTopology.emplace_back();
     new_layer.values_start  = m_Values.size();
     new_layer.weights_start = m_Weights.size();
     new_layer.values_count  = neurons_count;
     new_layer.weights_count = weights_to_add;
 
     m_Values.resize(m_Values.size() + neurons_count, 0.0f);
+    m_Deltas.resize(m_Deltas.size() + neurons_count, 0.0f);
     m_Biases.resize(m_Biases.size() + neurons_count, 0.0f);
     m_GradBiases.resize(m_GradBiases.size() + neurons_count, 0.0f);
-    m_Deltas.resize(m_Deltas.size() + neurons_count, 0.0f);
 
     if (weights_to_add > 0) {
         this->randomly_initialize_weight(m_Weights, weights_to_add);

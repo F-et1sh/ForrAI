@@ -10,6 +10,17 @@ namespace fa {
     using neuron_value_t = float;
 
     class Perceptron {
+    private:
+        struct Layer {
+            bool is_active = true;
+
+            std::size_t values_start{};
+            std::size_t weights_start{};
+
+            std::size_t values_count{};
+            std::size_t weights_count{};
+        };
+
     public:
         Perceptron(std::size_t input_layer_neurons_count,
                    std::size_t hidden_layer_neurons_count,
@@ -18,12 +29,76 @@ namespace fa {
 
         template <template <typename...> class Container = std::vector, typename Value = float>
         std::array<neuron_value_t, 10> forward(const Container<Value>& input_data) {
-            
+
+            for (std::size_t i = 0; i < input_data.size(); i++)
+                m_Values[i] = input_data[i];
+
+            for (std::size_t i = 1; i < m_LayersTopology.size(); i++) {
+                const auto& this_layer_topology = m_LayersTopology[i];
+                const auto& past_layer_topology = m_LayersTopology[i - 1];
+
+                auto this_layer_values = this->GetLayerBiases(this_layer_topology);
+                auto this_layer_biases = this->GetLayerBiases(this_layer_topology);
+
+                auto past_layer_values = this->GetLayerValues(past_layer_topology);
+
+                for (std::size_t j = 0; j < this_layer_topology.values_count; j++) {
+                    auto this_layer_neuron_weights = this->GetNeuronWeights(this_layer_topology, past_layer_topology, j);
+
+                    neuron_value_t pre_activation = this_layer_biases[j];
+
+                    for (std::size_t n = 0; n < past_layer_topology.values_count; n++) {
+                        pre_activation += past_layer_values[n] * this_layer_neuron_weights[n];
+                    }
+
+                    this_layer_values[j] = this_layer_topology.is_active ? std::max<neuron_value_t>(0, pre_activation) : pre_activation;
+                }
+            }
+
+            std::array<neuron_value_t, 10> result{};
+            std::size_t                    start = m_Values.size() - 10;
+
+            for (std::size_t i = 0; i < result.size(); i++)
+                result[i] = m_Values[start + i];
+
+            return result;
         }
 
     private:
         void create_layer(std::size_t neurons_count);
         void randomly_initialize_weight(container_t<neuron_value_t>& dst, std::size_t elements_count);
+
+    private:
+        std::span<neuron_value_t> GetLayerValues(const Layer& topology) {
+            return { &m_Values[topology.values_start], topology.values_count };
+        }
+
+        std::span<neuron_value_t> GetLayerBiases(const Layer& topology) {
+            return { &m_Biases[topology.values_start], topology.values_count };
+        }
+
+        std::span<neuron_value_t> GetLayerGradBiases(const Layer& topology) {
+            return { &m_GradBiases[topology.values_start], topology.values_count };
+        }
+
+        std::span<neuron_value_t> GetLayerDeltas(const Layer& topology) {
+            return { &m_Deltas[topology.values_start], topology.values_count };
+        }
+
+        std::span<neuron_value_t> GetLayerWeights(const Layer& topology) {
+            return { &m_Weights[topology.weights_start], topology.weights_count };
+        }
+
+        std::span<neuron_value_t> GetLayerGradWeights(const Layer& topology) {
+            return { &m_GradWeights[topology.weights_start], topology.weights_count };
+        }
+
+        std::span<neuron_value_t> GetNeuronWeights(const Layer& this_layer_topology,
+                                                   const Layer& past_layer_topology,
+                                                   std::size_t  neuron_index) {
+            std::size_t offset = this_layer_topology.weights_start + (neuron_index * past_layer_topology.values_count);
+            return { &m_Weights[offset], past_layer_topology.values_count };
+        }
 
     private:
         // values
@@ -36,16 +111,6 @@ namespace fa {
         container_t<neuron_value_t> m_Weights;
         container_t<neuron_value_t> m_GradWeights;
 
-        struct Layer {
-            bool is_active = true;
-
-            std::size_t values_start{};
-            std::size_t weights_start{};
-
-            std::size_t values_count{};
-            std::size_t weights_count{};
-        };
-
-        std::vector<Layer> m_Topology;
+        std::vector<Layer> m_LayersTopology;
     };
 } // namespace fa
