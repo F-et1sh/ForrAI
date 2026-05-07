@@ -10,13 +10,12 @@ namespace fa {
             m_Start = std::chrono::high_resolution_clock::now();
         }
         ~TimeScope() noexcept {
-            std::chrono::high_resolution_clock::time_point end        = std::chrono::high_resolution_clock::now();
-            double                                         elapsed_ms = std::chrono::duration<double, std::milli>(end - m_Start).count();
-
+            time_point end        = std::chrono::high_resolution_clock::now();
+            double     elapsed_ms = std::chrono::duration<double, std::milli>(end - m_Start).count();
             std::cerr << "[PROFILER]." << m_Label << " : " << elapsed_ms << " ms" << std::endl;
         }
 
-        void                            stop() noexcept { this->~TimeScope(); }
+        void stop() noexcept { this->~TimeScope(); }
 
     private:
         using time_point = std::chrono::high_resolution_clock::time_point;

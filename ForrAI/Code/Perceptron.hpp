@@ -85,11 +85,24 @@ namespace fa {
                 }
             }
 
+            const auto& last_layer        = m_LayersTopology.back();
+            auto        last_layer_values = this->GetLayerValues(last_layer);
+
             std::array<neuron_value_t, 10> result{};
-            const Layer&                   last_layer = m_LayersTopology.back();
-            for (std::size_t i = 0; i < result.size(); i++) {
-                result[i] = m_Values[last_layer.values_start + i];
+
+            for (std::size_t i = 0; i < last_layer_values.size(); i++)
+                result[i] = last_layer_values[i];
+
+            neuron_value_t max_value = *std::ranges::max_element(result);
+
+            neuron_value_t sum_exp = 0;
+            for (auto& value : result) {
+                value = std::exp(value - max_value);
+                sum_exp += value;
             }
+
+            for (auto& value : result)
+                value /= sum_exp;
 
             return result;
         }
