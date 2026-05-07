@@ -1,5 +1,7 @@
 #pragma once
+#include <iostream>
 #include <assert.h>
+#include <ranges>
 #include <span>
 #include <array>
 #include <vector>
@@ -9,6 +11,30 @@ namespace fa {
     template <class _Ty, class _Alloc = std::allocator<_Ty>>
     using container_t    = std::vector<_Ty, _Alloc>;
     using neuron_value_t = float;
+
+    static std::size_t classify(const std::array<neuron_value_t, 10>& predictions) {
+        std::size_t    result = 0;
+        neuron_value_t max    = predictions[0];
+
+        for (std::size_t i = 1; i < predictions.size(); i++) {
+            if (predictions[i] > max) {
+                max    = predictions[i];
+                result = i;
+            }
+        }
+        return result;
+    }
+
+    template <template <typename...> class Container = std::vector, typename Value = uint8_t>
+    static void print_image(const Container<Value>& image) {
+        for (size_t i = 0; i < image.size(); i++) {
+            std::cerr << (image[i] > 0.5 ? "X" : " ");
+            if (i > 0 && i % 28 == 0) {
+                std::cerr << std::endl;
+            }
+        }
+        std::cerr << std::endl;
+    }
 
     class Perceptron {
     private:
@@ -28,11 +54,11 @@ namespace fa {
                    std::size_t layers_count);
         ~Perceptron() = default;
 
-        template <template <typename...> class Container = std::vector, typename Value = float>
+        template <template <typename...> class Container = std::vector, typename Value = uint8_t>
         std::array<neuron_value_t, 10> forward(const Container<Value>& input_data) {
 
             for (std::size_t i = 0; i < input_data.size(); i++)
-                m_Values[i] = input_data[i];
+                m_Values[i] = static_cast<float>(input_data[i]) / 255.0f;
 
             for (std::size_t i = 1; i < m_LayersTopology.size(); i++) {
                 const auto& this_layer_topology = m_LayersTopology[i];
@@ -52,15 +78,15 @@ namespace fa {
                         pre_activation += past_layer_values[n] * this_layer_neuron_weights[n];
                     }
 
-                    this_layer_values[j] = this_layer_topology.is_active ? std::max<neuron_value_t>(0, pre_activation) : pre_activation;
+                    this_layer_values[j] = pre_activation;
                 }
             }
 
             std::array<neuron_value_t, 10> result{};
-            std::size_t                    start = m_Values.size() - 10;
-
-            for (std::size_t i = 0; i < result.size(); i++)
-                result[i] = m_Values[start + i];
+            const Layer&                   last_layer = m_LayersTopology.back();
+            for (std::size_t i = 0; i < 10; i++) {
+                result[i] = m_Values[last_layer.values_start + i];
+            }
 
             return result;
         }

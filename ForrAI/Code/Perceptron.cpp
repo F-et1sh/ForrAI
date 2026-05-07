@@ -58,23 +58,13 @@ void fa::Perceptron::backward(const std::array<neuron_value_t, 10>& error_signal
 }
 
 void fa::Perceptron::step(neuron_value_t learning_rate) {
-    for (std::size_t i = 1; i < m_LayersTopology.size(); i++) {
-        const auto& this_layer_topology = m_LayersTopology[i];
-        const auto& past_layer_topology = m_LayersTopology[i - 1];
-
-        auto this_layer_biases      = this->GetLayerBiases(this_layer_topology);
-        auto this_layer_grad_biases = this->GetLayerGradBiases(this_layer_topology);
-
-        for (std::size_t j = 0; j < this_layer_topology.values_count; j++) {
-
-            auto this_layer_neuron_weights      = this->GetNeuronWeights(this_layer_topology, past_layer_topology, j);
-            auto this_layer_neuron_grad_weights = this->GetNeuronGradWeights(this_layer_topology, past_layer_topology, j);
-
-            for (std::size_t k = 0; k < this_layer_neuron_weights.size(); k++)
-                this_layer_neuron_weights[k] -= learning_rate * this_layer_neuron_grad_weights[k];
-
-            this_layer_biases[j] -= learning_rate * this_layer_grad_biases[j];
-        }
+    for (size_t i = 0; i < m_Weights.size(); i++) {
+        m_Weights[i] -= learning_rate * m_GradWeights[i];
+        m_GradWeights[i] = 0;
+    }
+    for (size_t i = 0; i < m_Biases.size(); i++) {
+        m_Biases[i] -= learning_rate * m_GradBiases[i];
+        m_GradBiases[i] = 0;
     }
 }
 
