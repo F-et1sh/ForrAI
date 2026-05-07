@@ -58,7 +58,7 @@ namespace fa {
         std::array<neuron_value_t, 10> forward(const Container<Value>& input_data) {
 
             for (std::size_t i = 0; i < input_data.size(); i++)
-                m_Values[i] = static_cast<float>(input_data[i]) / 255.0f;
+                m_Values[i] = static_cast<float>(input_data[i]) / static_cast<float>(std::numeric_limits<Value>::max());
 
             for (std::size_t i = 1; i < m_LayersTopology.size(); i++) {
                 const auto& this_layer_topology = m_LayersTopology[i];
