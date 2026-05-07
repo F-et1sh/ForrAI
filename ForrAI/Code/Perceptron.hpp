@@ -39,7 +39,7 @@ namespace fa {
     }
 
     class Perceptron {
-    private:
+    public:
         struct Layer {
             bool is_active = true;
 
@@ -122,9 +122,7 @@ namespace fa {
 
             return result;
         }
-
         void backward(const std::array<neuron_value_t, 10>& error_signal);
-
         void step(neuron_value_t learning_rate);
 
     private:
@@ -140,6 +138,16 @@ namespace fa {
         std::span<neuron_value_t> GetLayerGradWeights(const Layer& topology);
         std::span<neuron_value_t> GetNeuronWeights(const Layer& this_layer_topology, const Layer& past_layer_topology, std::size_t neuron_index);
         std::span<neuron_value_t> GetNeuronGradWeights(const Layer& this_layer_topology, const Layer& past_layer_topology, std::size_t neuron_index);
+
+    public:
+        container_t<neuron_value_t> GetLayerValues();
+        container_t<neuron_value_t> GetLayerBiases();
+        container_t<neuron_value_t> GetLayerGradBiases();
+        container_t<neuron_value_t> GetLayerDeltas();
+        container_t<neuron_value_t> GetLayerWeights();
+        container_t<neuron_value_t> GetLayerGradWeights();
+
+        std::vector<Layer> GetLayersTopology();
 
     private:
         // values

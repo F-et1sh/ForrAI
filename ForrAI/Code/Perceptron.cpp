@@ -152,3 +152,13 @@ std::span<fa::neuron_value_t> fa::Perceptron::GetNeuronGradWeights(const Layer& 
     std::size_t offset = this_layer_topology.weights_start + (neuron_index * past_layer_topology.values_count);
     return { &m_GradWeights[offset], past_layer_topology.values_count };
 }
+
+// clang-format off
+fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerValues() { return m_Values; }
+fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerBiases() { return m_Biases; }
+fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerGradBiases() { return m_GradBiases; }
+fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerDeltas() { return m_Deltas; }
+fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerWeights() { return m_Weights; }
+fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerGradWeights() { return m_GradWeights; }
+std::vector<fa::Perceptron::Layer> fa::Perceptron::GetLayersTopology() { return m_LayersTopology; }
+// clang-format on

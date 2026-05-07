@@ -11,6 +11,8 @@
   <ItemGroup>
     <ClInclude Include="Code\Perceptron.hpp" />
     <ClInclude Include="Code\Profiler.hpp" />
+    <ClInclude Include="Code\Serializer.hpp" />
+    <ClInclude Include="Code\tools.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\main.cpp" />

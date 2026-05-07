@@ -2,6 +2,8 @@
 #include <iostream>
 #include <chrono>
 
+#include "tools.hpp"
+
 namespace fa {
     class TimeScope {
     public:
@@ -23,9 +25,5 @@ namespace fa {
         std::string m_Label{};
     };
 
-#define FA_CONCATENATE_DIRECT(x, y) x##y
-#define FA_CONCATENATE(x, y) FA_CONCATENATE_DIRECT(x, y)
-#define FA_VARIABLE(str) FA_CONCATENATE(str, __LINE__)
-
-#define FA_SCOPE_TIMER(label) fa::TimeScope FA_VARIABLE(scope_, __LINE__)(std::string(label));
+#define FA_SCOPE_TIMER(label) fa::TimeScope FA_VARIABLE_ON_LINE(scope_)(std::string(label));
 } // namespace fa

@@ -93,6 +93,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Profiler.hpp" />
+    <ClInclude Include="Code\Serializer.hpp" />
+    <ClInclude Include="Code\tools.hpp" />
     <None Include="old\core.hpp" />
     <ClInclude Include="Code\Perceptron.hpp" />
     <None Include="old\RegressionModel.hpp" />
