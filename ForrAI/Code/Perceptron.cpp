@@ -52,7 +52,7 @@ void fa::Perceptron::backward(const std::array<neuron_value_t, 10>& error_signal
                 grad_weights[k] += this_layer_deltas[j] * past_layer_values[k];
             }
 
-            this_layer_grad_biases[j] = this_layer_deltas[j];
+            this_layer_grad_biases[j] += this_layer_deltas[j];
         }
     }
 }
@@ -91,7 +91,7 @@ void fa::Perceptron::create_layer(std::size_t neurons_count) {
 
 void fa::Perceptron::randomly_initialize_weight(container_t<neuron_value_t>& dst, std::size_t elements_count) {
     static std::mt19937                            gen{ std::random_device{}() };
-    std::uniform_real_distribution<neuron_value_t> uni{ -1.0, 1.0 };
+    std::uniform_real_distribution<neuron_value_t> uni{ 0.0, 1.0 };
 
     dst.reserve(dst.size() + elements_count);
 

@@ -64,7 +64,7 @@ namespace fa {
                 const auto& this_layer_topology = m_LayersTopology[i];
                 const auto& past_layer_topology = m_LayersTopology[i - 1];
 
-                auto this_layer_values = this->GetLayerBiases(this_layer_topology);
+                auto this_layer_values = this->GetLayerValues(this_layer_topology);
                 auto this_layer_biases = this->GetLayerBiases(this_layer_topology);
 
                 auto past_layer_values = this->GetLayerValues(past_layer_topology);
@@ -78,13 +78,13 @@ namespace fa {
                         pre_activation += past_layer_values[n] * this_layer_neuron_weights[n];
                     }
 
-                    this_layer_values[j] = pre_activation;
+                    this_layer_values[j] = this_layer_topology.is_active ? std::max<neuron_value_t>(0, pre_activation) : pre_activation;
                 }
             }
 
             std::array<neuron_value_t, 10> result{};
             const Layer&                   last_layer = m_LayersTopology.back();
-            for (std::size_t i = 0; i < 10; i++) {
+            for (std::size_t i = 0; i < result.size(); i++) {
                 result[i] = m_Values[last_layer.values_start + i];
             }
 
