@@ -92,6 +92,7 @@
     <None Include="old\RegressionModel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Code\Profiler.hpp" />
     <None Include="old\core.hpp" />
     <ClInclude Include="Code\Perceptron.hpp" />
     <None Include="old\RegressionModel.hpp" />
