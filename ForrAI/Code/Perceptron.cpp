@@ -1,16 +1,8 @@
 #include "Perceptron.hpp"
 
-fa::Perceptron::Perceptron(std::size_t input_layer_neurons_count,
-                           std::size_t hidden_layer_neurons_count,
-                           std::size_t layers_count) {
+fa::Perceptron::Perceptron(std::size_t input_layer_neurons_count, std::vector<std::size_t> hidden_layers) {
     this->create_layer(input_layer_neurons_count);
-
-    if (layers_count >= 2) {
-        for (std::size_t i = 0; i < layers_count - 1; i++) {
-            this->create_layer(hidden_layer_neurons_count);
-        }
-    }
-
+    for (auto e : hidden_layers) this->create_layer(e);
     this->create_layer(10);
 }
 
@@ -69,18 +61,16 @@ void fa::Perceptron::backward(const std::array<neuron_value_t, 10>& error_signal
 void fa::Perceptron::step(neuron_value_t learning_rate) {
     //FA_SCOPE_TIMER("step")
 
-    for (size_t i = 0; i < m_Weights.size() - 3; i += 4) {
-        m_Weights[i] -= learning_rate * m_GradWeights[i];
-        m_Weights[i + 1] -= learning_rate * m_GradWeights[i + 1];
-        m_Weights[i + 2] -= learning_rate * m_GradWeights[i + 2];
-        m_Weights[i + 3] -= learning_rate * m_GradWeights[i + 3];
+    constexpr static fa::neuron_value_t alpha = 0.8;
+
+    for (size_t i = 0; i < m_Weights.size(); i++) {
+        m_VelocityWeights[i] = alpha * m_VelocityWeights[i] + (1.0f - alpha) * m_GradWeights[i];
+        m_Weights[i] -= learning_rate * m_VelocityWeights[i];
     }
 
-    for (size_t i = 0; i < m_Biases.size() - 3; i += 4) {
-        m_Biases[i] -= learning_rate * m_GradBiases[i];
-        m_Biases[i + 1] -= learning_rate * m_GradBiases[i + 1];
-        m_Biases[i + 2] -= learning_rate * m_GradBiases[i + 2];
-        m_Biases[i + 3] -= learning_rate * m_GradBiases[i + 3];
+    for (size_t i = 0; i < m_Biases.size(); i++) {
+        m_VelocityBiases[i] = alpha * m_VelocityBiases[i] + (1.0f - alpha) * m_GradBiases[i];
+        m_Biases[i] -= learning_rate * m_VelocityBiases[i];
     }
 
     std::ranges::fill(m_GradWeights, 0);
@@ -101,21 +91,25 @@ void fa::Perceptron::create_layer(std::size_t neurons_count) {
     m_Deltas.resize(m_Deltas.size() + neurons_count, 0.0f);
     m_Biases.resize(m_Biases.size() + neurons_count, 0.0f);
     m_GradBiases.resize(m_GradBiases.size() + neurons_count, 0.0f);
+    m_VelocityBiases.resize(m_VelocityBiases.size() + neurons_count, 0.0f);
 
     if (weights_to_add > 0) {
         this->randomly_initialize_weight(m_Weights, weights_to_add);
         m_GradWeights.resize(m_GradWeights.size() + weights_to_add, 0.0f);
+        m_VelocityWeights.resize(m_VelocityWeights.size() + weights_to_add, 0.0f);
     }
 }
 
 void fa::Perceptron::randomly_initialize_weight(container_t<neuron_value_t>& dst, std::size_t elements_count) {
-    static std::mt19937                            gen{ std::random_device{}() };
-    std::uniform_real_distribution<neuron_value_t> uni{ 0.0, 1.0 };
+    std::size_t past_layer_count = m_LayersTopology.back().values_count;
+
+    static std::mt19937                      gen{ std::random_device{}() };
+    std::normal_distribution<neuron_value_t> dist{ 0.0, static_cast<neuron_value_t>(std::sqrt(2.0 / static_cast<double>(past_layer_count))) };
 
     dst.reserve(dst.size() + elements_count);
 
     for (size_t i = 0; i < elements_count; i++) {
-        dst.push_back(static_cast<neuron_value_t>(0.01 * uni(gen)));
+        dst.push_back(dist(gen));
     }
 }
 
@@ -157,8 +151,10 @@ std::span<fa::neuron_value_t> fa::Perceptron::GetNeuronGradWeights(const Layer& 
 fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerValues() { return m_Values; }
 fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerBiases() { return m_Biases; }
 fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerGradBiases() { return m_GradBiases; }
+fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerVelocityBiases() { return m_VelocityBiases; }
 fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerDeltas() { return m_Deltas; }
 fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerWeights() { return m_Weights; }
 fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerGradWeights() { return m_GradWeights; }
+fa::container_t<fa::neuron_value_t> fa::Perceptron::GetLayerVelocityWeights() { return m_VelocityWeights; }
 std::vector<fa::Perceptron::Layer> fa::Perceptron::GetLayersTopology() { return m_LayersTopology; }
 // clang-format on

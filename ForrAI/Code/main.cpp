@@ -7,12 +7,12 @@ int main() {
     {
         FA_SCOPE_TIMER("ForrAI-training-time")
 
-        fa::Perceptron perceptron(28 * 28, 10, 3);
+        fa::Perceptron perceptron(28 * 28, { 512, 256, 128 }); // total : 5 layers and 1 690 neurons
 
         // Load MNIST data
         auto dataset = mnist::read_dataset<std::vector, std::vector, std::uint8_t, std::uint8_t>("Files/mnist_archive");
 
-        for (size_t epoch = 0; epoch < 50; epoch++) {
+        for (size_t epoch = 0; epoch < 10; epoch++) {
             FA_SCOPE_TIMER("Epoch " + std::to_string(epoch))
 
             auto zipped = std::views::zip(dataset.training_images, dataset.training_labels);
@@ -20,8 +20,7 @@ int main() {
             static std::mt19937 gen{ std::random_device{}() };
             std::ranges::shuffle(zipped, gen);
 
-            fa::neuron_value_t current_learning_rate = (epoch < 10) ? 0.05 : (epoch < 20) ? 0.01
-                                                                                          : 0.001;
+            fa::neuron_value_t current_learning_rate = static_cast<fa::neuron_value_t>(0.069f * std::exp(-0.1f * epoch));
 
             for (std::size_t i = 0; i < dataset.training_images.size(); i++) {
                 const auto& image = dataset.training_images[i];
@@ -64,6 +63,10 @@ int main() {
 
         accuracy = static_cast<double>(correct_count) / dataset.test_images.size();
         std::cerr << "Accuracy : " << accuracy << std::endl;
+
+        fa::Serializer        serializer{ perceptron };
+        std::filesystem::path path = "ForrAI-final.bin";
+        serializer.Write(path);
     }
 
     std::system("pause");

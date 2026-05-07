@@ -51,10 +51,7 @@ namespace fa {
         };
 
     public:
-        Perceptron(std::size_t input_layer_neurons_count,
-                   std::size_t hidden_layer_neurons_count,
-                   std::size_t layers_count);
-
+        Perceptron(std::size_t input_layer_neurons_count, std::vector<std::size_t> hidden_layers);
         Perceptron(const container_t<neuron_value_t>& values,
                    const container_t<neuron_value_t>& biases,
                    const container_t<neuron_value_t>& grad_biases,
@@ -69,15 +66,16 @@ namespace fa {
               m_Weights(weights),
               m_GradWeights(grad_weights),
               m_LayersTopology(layers_topology) {}
-
         ~Perceptron() = default;
 
         template <template <typename...> class Container = std::vector, typename Value = uint8_t>
         std::array<neuron_value_t, 10> forward(const Container<Value>& input_data) {
             //FA_SCOPE_TIMER("forward")
 
+            constexpr float value_max = std::numeric_limits<Value>::max();
+
             for (std::size_t i = 0; i < input_data.size(); i++)
-                m_Values[i] = static_cast<float>(input_data[i]) / static_cast<float>(std::numeric_limits<Value>::max());
+                m_Values[i] = static_cast<float>(input_data[i]) / value_max;
 
             for (std::size_t i = 1; i < m_LayersTopology.size(); i++) {
                 const auto& this_layer_topology = m_LayersTopology[i];
@@ -88,7 +86,8 @@ namespace fa {
 
                 auto past_layer_values = this->GetLayerValues(past_layer_topology);
 
-                for (std::size_t j = 0; j < this_layer_topology.values_count; j++) {
+#pragma omp parallel for schedule(static)
+                for (std::int64_t j = 0; j < this_layer_topology.values_count; j++) {
                     auto this_layer_neuron_weights = this->GetNeuronWeights(this_layer_topology, past_layer_topology, j);
 
                     neuron_value_t pre_activation = this_layer_biases[j];
@@ -143,23 +142,27 @@ namespace fa {
         container_t<neuron_value_t> GetLayerValues();
         container_t<neuron_value_t> GetLayerBiases();
         container_t<neuron_value_t> GetLayerGradBiases();
+        container_t<neuron_value_t> GetLayerVelocityBiases();
         container_t<neuron_value_t> GetLayerDeltas();
         container_t<neuron_value_t> GetLayerWeights();
         container_t<neuron_value_t> GetLayerGradWeights();
+        container_t<neuron_value_t> GetLayerVelocityWeights();
 
         std::vector<Layer> GetLayersTopology();
 
     private:
         // values
-        container_t<neuron_value_t> m_Values;
-        container_t<neuron_value_t> m_Biases;
-        container_t<neuron_value_t> m_GradBiases;
-        container_t<neuron_value_t> m_Deltas;
+        container_t<neuron_value_t> m_Values{};
+        container_t<neuron_value_t> m_Deltas{};
+        container_t<neuron_value_t> m_Biases{};
+        container_t<neuron_value_t> m_GradBiases{};
+        container_t<neuron_value_t> m_VelocityBiases{};
 
         // weights
-        container_t<neuron_value_t> m_Weights;
-        container_t<neuron_value_t> m_GradWeights;
+        container_t<neuron_value_t> m_Weights{};
+        container_t<neuron_value_t> m_GradWeights{};
+        container_t<neuron_value_t> m_VelocityWeights{};
 
-        std::vector<Layer> m_LayersTopology;
+        std::vector<Layer> m_LayersTopology{};
     };
 } // namespace fa

@@ -18,9 +18,11 @@ namespace fa {
             write_variable(file, m_Perceptron.GetLayerValues());
             write_variable(file, m_Perceptron.GetLayerBiases());
             write_variable(file, m_Perceptron.GetLayerGradBiases());
+            write_variable(file, m_Perceptron.GetLayerVelocityBiases());
             write_variable(file, m_Perceptron.GetLayerDeltas());
             write_variable(file, m_Perceptron.GetLayerWeights());
             write_variable(file, m_Perceptron.GetLayerGradWeights());
+            write_variable(file, m_Perceptron.GetLayerVelocityWeights());
             write_variable(file, m_Perceptron.GetLayersTopology());
         }
 
@@ -31,18 +33,22 @@ namespace fa {
             fa::container_t<fa::neuron_value_t> layer_values{};
             fa::container_t<fa::neuron_value_t> layer_biases{};
             fa::container_t<fa::neuron_value_t> layer_grad_biases{};
+            fa::container_t<fa::neuron_value_t> layer_velocity_biases{};
             fa::container_t<fa::neuron_value_t> layer_deltas{};
             fa::container_t<fa::neuron_value_t> layer_weights{};
             fa::container_t<fa::neuron_value_t> layer_grad_weights{};
+            fa::container_t<fa::neuron_value_t> layer_velocity_weights{};
 
             std::vector<fa::Perceptron::Layer> layers_topology{};
 
             read_variable(file, layer_values);
             read_variable(file, layer_biases);
             read_variable(file, layer_grad_biases);
+            read_variable(file, layer_velocity_biases);
             read_variable(file, layer_deltas);
             read_variable(file, layer_weights);
             read_variable(file, layer_grad_weights);
+            read_variable(file, layer_velocity_weights);
             read_variable(file, layers_topology);
 
             m_Perceptron = fa::Perceptron{ layer_values,
