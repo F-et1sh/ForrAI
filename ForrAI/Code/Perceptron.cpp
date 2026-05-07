@@ -33,29 +33,35 @@ void fa::Perceptron::backward(const std::array<neuron_value_t, 10>& error_signal
         auto past_layer_values      = this->GetLayerValues(past_layer_topology);
 
         if (i < m_LayersTopology.size() - 1) {
+            std::ranges::fill(this_layer_deltas, 0.0);
+
             const auto& next_layer_topology = m_LayersTopology[i + 1];
             auto        next_layer_deltas   = this->GetLayerDeltas(next_layer_topology);
 
-            for (std::size_t j = 0; j < this_layer_topology.values_count; j++) {
-                neuron_value_t error_sum{};
+            for (std::size_t k = 0; k < next_layer_topology.values_count; k++) {
+                auto           next_layer_weights = this->GetNeuronWeights(next_layer_topology, this_layer_topology, k);
+                neuron_value_t next_layer_delta   = next_layer_deltas[k];
 
-                for (std::size_t k = 0; k < next_layer_topology.values_count; k++) {
-                    auto next_weights = this->GetNeuronWeights(next_layer_topology, this_layer_topology, k);
-                    error_sum += next_layer_deltas[k] * next_weights[j];
+                for (std::size_t j = 0; j < this_layer_topology.values_count; j++) {
+                    this_layer_deltas[j] += next_layer_delta * next_layer_weights[j];
                 }
+            }
 
-                this_layer_deltas[j] = (this_layer_values[j] > 0) ? error_sum : 0;
+            for (std::size_t j = 0; j < this_layer_topology.values_count; j++) {
+                this_layer_deltas[j] = (this_layer_values[j] > 0) ? this_layer_deltas[j] : 0;
             }
         }
 
         for (std::size_t j = 0; j < this_layer_topology.values_count; j++) {
+            neuron_value_t this_layer_delta = this_layer_deltas[j];
+            if (this_layer_delta == 0) continue;
+
             auto grad_weights = GetNeuronGradWeights(this_layer_topology, past_layer_topology, j);
+            this_layer_grad_biases[j] += this_layer_delta;
 
             for (std::size_t k = 0; k < past_layer_topology.values_count; k++) {
-                grad_weights[k] += this_layer_deltas[j] * past_layer_values[k];
+                grad_weights[k] += this_layer_delta * past_layer_values[k];
             }
-
-            this_layer_grad_biases[j] += this_layer_deltas[j];
         }
     }
 }
