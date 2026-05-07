@@ -54,6 +54,22 @@ namespace fa {
         Perceptron(std::size_t input_layer_neurons_count,
                    std::size_t hidden_layer_neurons_count,
                    std::size_t layers_count);
+
+        Perceptron(const container_t<neuron_value_t>& values,
+                   const container_t<neuron_value_t>& biases,
+                   const container_t<neuron_value_t>& grad_biases,
+                   const container_t<neuron_value_t>& deltas,
+                   const container_t<neuron_value_t>& weights,
+                   const container_t<neuron_value_t>& grad_weights,
+                   const std::vector<Layer>&          layers_topology)
+            : m_Values(values),
+              m_Biases(biases),
+              m_GradBiases(grad_biases),
+              m_Deltas(deltas),
+              m_Weights(weights),
+              m_GradWeights(grad_weights),
+              m_LayersTopology(layers_topology) {}
+
         ~Perceptron() = default;
 
         template <template <typename...> class Container = std::vector, typename Value = uint8_t>
@@ -116,43 +132,14 @@ namespace fa {
         void randomly_initialize_weight(container_t<neuron_value_t>& dst, std::size_t elements_count);
 
     private:
-        std::span<neuron_value_t> GetLayerValues(const Layer& topology) {
-            return { &m_Values[topology.values_start], topology.values_count };
-        }
-
-        std::span<neuron_value_t> GetLayerBiases(const Layer& topology) {
-            return { &m_Biases[topology.values_start], topology.values_count };
-        }
-
-        std::span<neuron_value_t> GetLayerGradBiases(const Layer& topology) {
-            return { &m_GradBiases[topology.values_start], topology.values_count };
-        }
-
-        std::span<neuron_value_t> GetLayerDeltas(const Layer& topology) {
-            return { &m_Deltas[topology.values_start], topology.values_count };
-        }
-
-        std::span<neuron_value_t> GetLayerWeights(const Layer& topology) {
-            return { &m_Weights[topology.weights_start], topology.weights_count };
-        }
-
-        std::span<neuron_value_t> GetLayerGradWeights(const Layer& topology) {
-            return { &m_GradWeights[topology.weights_start], topology.weights_count };
-        }
-
-        std::span<neuron_value_t> GetNeuronWeights(const Layer& this_layer_topology,
-                                                   const Layer& past_layer_topology,
-                                                   std::size_t  neuron_index) {
-            std::size_t offset = this_layer_topology.weights_start + (neuron_index * past_layer_topology.values_count);
-            return { &m_Weights[offset], past_layer_topology.values_count };
-        }
-
-        std::span<neuron_value_t> GetNeuronGradWeights(const Layer& this_layer_topology,
-                                                       const Layer& past_layer_topology,
-                                                       std::size_t  neuron_index) {
-            std::size_t offset = this_layer_topology.weights_start + (neuron_index * past_layer_topology.values_count);
-            return { &m_GradWeights[offset], past_layer_topology.values_count };
-        }
+        std::span<neuron_value_t> GetLayerValues(const Layer& topology);
+        std::span<neuron_value_t> GetLayerBiases(const Layer& topology);
+        std::span<neuron_value_t> GetLayerGradBiases(const Layer& topology);
+        std::span<neuron_value_t> GetLayerDeltas(const Layer& topology);
+        std::span<neuron_value_t> GetLayerWeights(const Layer& topology);
+        std::span<neuron_value_t> GetLayerGradWeights(const Layer& topology);
+        std::span<neuron_value_t> GetNeuronWeights(const Layer& this_layer_topology, const Layer& past_layer_topology, std::size_t neuron_index);
+        std::span<neuron_value_t> GetNeuronGradWeights(const Layer& this_layer_topology, const Layer& past_layer_topology, std::size_t neuron_index);
 
     private:
         // values

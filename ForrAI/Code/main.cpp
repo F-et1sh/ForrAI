@@ -42,20 +42,18 @@ int main() {
 
         correct_count += answer == label ? 1 : 0;
 
-        //fa::print_image(image);
+        /*fa::print_image(image);
 
-        //for (std::size_t j = 0; j < predictions.size(); j++) {
-        //    std::cerr << j << " : " << predictions[j] << std::endl;
-        //}
+        for (std::size_t j = 0; j < predictions.size(); j++) {
+            std::cerr << j << " : " << predictions[j] << std::endl;
+        }
 
-        //std::cerr << "Predicted : " << fa::classify(predictions) << ". Target : " << static_cast<std::size_t>(label) << std::endl;
-        //(void) std::getchar();
+        std::cerr << "Predicted : " << fa::classify(predictions) << ". Target : " << static_cast<std::size_t>(label) << std::endl;
+        (void) std::getchar();*/
     }
 
     double accuracy = static_cast<double>(correct_count) / dataset.test_images.size();
     std::cerr << "Accuracy : " << accuracy << std::endl;
-
-    std::system("pause");
 
     return 0;
 }

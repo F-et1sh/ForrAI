@@ -118,3 +118,37 @@ void fa::Perceptron::randomly_initialize_weight(container_t<neuron_value_t>& dst
         dst.push_back(static_cast<neuron_value_t>(0.01 * uni(gen)));
     }
 }
+
+std::span<fa::neuron_value_t> fa::Perceptron::GetLayerValues(const Layer& topology) {
+    return { &m_Values[topology.values_start], topology.values_count };
+}
+
+std::span<fa::neuron_value_t> fa::Perceptron::GetLayerBiases(const Layer& topology) {
+    return { &m_Biases[topology.values_start], topology.values_count };
+}
+
+std::span<fa::neuron_value_t> fa::Perceptron::GetLayerGradBiases(const Layer& topology) {
+    return { &m_GradBiases[topology.values_start], topology.values_count };
+}
+
+std::span<fa::neuron_value_t> fa::Perceptron::GetLayerDeltas(const Layer& topology) {
+    return { &m_Deltas[topology.values_start], topology.values_count };
+}
+
+std::span<fa::neuron_value_t> fa::Perceptron::GetLayerWeights(const Layer& topology) {
+    return { &m_Weights[topology.weights_start], topology.weights_count };
+}
+
+std::span<fa::neuron_value_t> fa::Perceptron::GetLayerGradWeights(const Layer& topology) {
+    return { &m_GradWeights[topology.weights_start], topology.weights_count };
+}
+
+std::span<fa::neuron_value_t> fa::Perceptron::GetNeuronWeights(const Layer& this_layer_topology, const Layer& past_layer_topology, std::size_t neuron_index) {
+    std::size_t offset = this_layer_topology.weights_start + (neuron_index * past_layer_topology.values_count);
+    return { &m_Weights[offset], past_layer_topology.values_count };
+}
+
+std::span<fa::neuron_value_t> fa::Perceptron::GetNeuronGradWeights(const Layer& this_layer_topology, const Layer& past_layer_topology, std::size_t neuron_index) {
+    std::size_t offset = this_layer_topology.weights_start + (neuron_index * past_layer_topology.values_count);
+    return { &m_GradWeights[offset], past_layer_topology.values_count };
+}
