@@ -63,45 +63,22 @@ void fa::Perceptron::backward(const std::array<neuron_value_t, 10>& error_signal
 void fa::Perceptron::step(neuron_value_t learning_rate) {
     //FA_SCOPE_TIMER("step")
 
-    for (size_t i = 0; i < m_Weights.size() - 7; i += 8) {
+    for (size_t i = 0; i < m_Weights.size() - 3; i += 4) {
         m_Weights[i] -= learning_rate * m_GradWeights[i];
         m_Weights[i + 1] -= learning_rate * m_GradWeights[i + 1];
         m_Weights[i + 2] -= learning_rate * m_GradWeights[i + 2];
         m_Weights[i + 3] -= learning_rate * m_GradWeights[i + 3];
-        m_Weights[i + 4] -= learning_rate * m_GradWeights[i + 4];
-        m_Weights[i + 5] -= learning_rate * m_GradWeights[i + 5];
-        m_Weights[i + 6] -= learning_rate * m_GradWeights[i + 6];
-        m_Weights[i + 7] -= learning_rate * m_GradWeights[i + 7];
-
-        m_GradWeights[i]     = 0;
-        m_GradWeights[i + 1] = 0;
-        m_GradWeights[i + 2] = 0;
-        m_GradWeights[i + 3] = 0;
-        m_GradWeights[i + 4] = 0;
-        m_GradWeights[i + 5] = 0;
-        m_GradWeights[i + 6] = 0;
-        m_GradWeights[i + 7] = 0;
     }
 
-    for (size_t i = 0; i < m_Biases.size() - 7; i += 8) {
+    for (size_t i = 0; i < m_Biases.size() - 3; i += 4) {
         m_Biases[i] -= learning_rate * m_GradBiases[i];
         m_Biases[i + 1] -= learning_rate * m_GradBiases[i + 1];
         m_Biases[i + 2] -= learning_rate * m_GradBiases[i + 2];
         m_Biases[i + 3] -= learning_rate * m_GradBiases[i + 3];
-        m_Biases[i + 4] -= learning_rate * m_GradBiases[i + 4];
-        m_Biases[i + 5] -= learning_rate * m_GradBiases[i + 5];
-        m_Biases[i + 6] -= learning_rate * m_GradBiases[i + 6];
-        m_Biases[i + 7] -= learning_rate * m_GradBiases[i + 7];
-
-        m_GradBiases[i]     = 0;
-        m_GradBiases[i + 1] = 0;
-        m_GradBiases[i + 2] = 0;
-        m_GradBiases[i + 3] = 0;
-        m_GradBiases[i + 4] = 0;
-        m_GradBiases[i + 5] = 0;
-        m_GradBiases[i + 6] = 0;
-        m_GradBiases[i + 7] = 0;
     }
+
+    std::ranges::fill(m_GradWeights, 0);
+    std::ranges::fill(m_GradBiases, 0);
 }
 
 void fa::Perceptron::create_layer(std::size_t neurons_count) {
