@@ -7,6 +7,8 @@
 #include <vector>
 #include <random>
 
+#include "Profiler.hpp"
+
 namespace fa {
     template <class _Ty, class _Alloc = std::allocator<_Ty>>
     using container_t    = std::vector<_Ty, _Alloc>;
@@ -56,6 +58,7 @@ namespace fa {
 
         template <template <typename...> class Container = std::vector, typename Value = uint8_t>
         std::array<neuron_value_t, 10> forward(const Container<Value>& input_data) {
+            //FA_SCOPE_TIMER("forward")
 
             for (std::size_t i = 0; i < input_data.size(); i++)
                 m_Values[i] = static_cast<float>(input_data[i]) / static_cast<float>(std::numeric_limits<Value>::max());
