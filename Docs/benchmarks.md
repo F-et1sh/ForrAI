@@ -155,3 +155,37 @@ Accuracy : 0.2039
 [PROFILER].Epoch 8 : 5475.02 ms
 [PROFILER].Epoch 9 : 5446.15 ms
 Accuracy : 0.1135
+
+// 10, 30 epoches, used shuffle and smart learning_rate
+
+[PROFILER].Epoch 0 : 309.429 ms
+[PROFILER].Epoch 1 : 281.483 ms
+[PROFILER].Epoch 2 : 282.491 ms
+[PROFILER].Epoch 3 : 273.805 ms
+[PROFILER].Epoch 4 : 258.774 ms
+[PROFILER].Epoch 5 : 269.797 ms
+[PROFILER].Epoch 6 : 270.787 ms
+[PROFILER].Epoch 7 : 264.797 ms
+[PROFILER].Epoch 8 : 263.859 ms
+[PROFILER].Epoch 9 : 259.511 ms
+[PROFILER].Epoch 10 : 255.806 ms
+[PROFILER].Epoch 11 : 267.851 ms
+[PROFILER].Epoch 12 : 264.724 ms
+[PROFILER].Epoch 13 : 260.358 ms
+[PROFILER].Epoch 14 : 261.328 ms
+[PROFILER].Epoch 15 : 260.997 ms
+[PROFILER].Epoch 16 : 262.935 ms
+[PROFILER].Epoch 17 : 263.987 ms
+[PROFILER].Epoch 18 : 263.242 ms
+[PROFILER].Epoch 19 : 263.2 ms
+[PROFILER].Epoch 20 : 274.933 ms
+[PROFILER].Epoch 21 : 272.03 ms
+[PROFILER].Epoch 22 : 277.465 ms
+[PROFILER].Epoch 23 : 275.344 ms
+[PROFILER].Epoch 24 : 275.894 ms
+[PROFILER].Epoch 25 : 271.53 ms
+[PROFILER].Epoch 26 : 262.217 ms
+[PROFILER].Epoch 27 : 258.294 ms
+[PROFILER].Epoch 28 : 268.811 ms
+[PROFILER].Epoch 29 : 276.272 ms
+Accuracy : 0.9459
