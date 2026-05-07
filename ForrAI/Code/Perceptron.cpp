@@ -23,6 +23,7 @@ void fa::Perceptron::backward(const std::array<neuron_value_t, 10>& error_signal
         last_layer_deltas[i] = error_signal[i];
 
     for (std::size_t i = m_LayersTopology.size() - 1; i > 0; i--) {
+
         const auto& this_layer_topology = m_LayersTopology[i];
         const auto& past_layer_topology = m_LayersTopology[i - 1];
 
@@ -51,10 +52,10 @@ void fa::Perceptron::backward(const std::array<neuron_value_t, 10>& error_signal
             auto grad_weights = GetNeuronGradWeights(this_layer_topology, past_layer_topology, j);
 
             for (std::size_t k = 0; k < past_layer_topology.values_count; k++) {
-                grad_weights[k] = this_layer_deltas[j] * past_layer_values[k];
+                grad_weights[k] += this_layer_deltas[j] * past_layer_values[k];
             }
 
-            this_layer_grad_biases[j] = this_layer_deltas[j];
+            this_layer_grad_biases[j] += this_layer_deltas[j];
         }
     }
 }

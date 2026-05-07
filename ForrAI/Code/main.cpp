@@ -25,7 +25,9 @@ int main() {
             }
 
             perceptron.backward(error_singal);
-            perceptron.step(static_cast<fa::neuron_value_t>(0.001));
+
+            if (i % 32 == 0)
+                perceptron.step(static_cast<fa::neuron_value_t>(epoch <= 5 ? 0.001 : 0.0005));
         }
     }
 
