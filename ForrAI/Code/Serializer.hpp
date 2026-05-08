@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <fstream>
 #include <filesystem>
 
@@ -54,21 +54,23 @@ namespace fa {
             m_Perceptron = fa::Perceptron{ layer_values,
                                            layer_biases,
                                            layer_grad_biases,
+                                           layer_velocity_biases,
                                            layer_deltas,
                                            layer_weights,
                                            layer_grad_weights,
+                                           layer_velocity_weights,
                                            layers_topology };
         }
 
     private:
-        template<template<typename...> class Container, typename Element>
+        template <template <typename...> class Container, typename Element>
         static void write_variable(std::ofstream& file, const Container<Element>& vec) {
             std::size_t size = vec.size();
             file.write(reinterpret_cast<const char*>(&size), sizeof(size));
             file.write(reinterpret_cast<const char*>(vec.data()), size * sizeof(Element));
         }
 
-        template<template<typename...> class Container, typename Element>
+        template <template <typename...> class Container, typename Element>
         static void read_variable(std::ifstream& file, Container<Element>& vec) {
             std::size_t size{};
             file.read(reinterpret_cast<char*>(&size), sizeof(size));

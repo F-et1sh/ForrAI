@@ -1,18 +1,37 @@
-#include "mnist/mnist_reader.hpp"
+﻿#include "mnist/mnist_reader.hpp"
 
 #include "Perceptron.hpp"
 #include "Serializer.hpp"
+
+template <typename T>
+void check_accuracy(fa::Perceptron& perceptron, T& dataset) {
+    std::size_t correct_count{};
+    double      accuracy{};
+
+    for (std::size_t i = 0; i < dataset.test_images.size(); i++) {
+        const auto& image = dataset.test_images[i];
+        const auto& label = dataset.test_labels[i];
+
+        const auto  predictions = perceptron.forward(image);
+        std::size_t answer      = fa::classify(predictions);
+
+        correct_count += answer == label ? 1 : 0;
+    }
+
+    accuracy = static_cast<double>(correct_count) / dataset.test_images.size();
+    std::cerr << "Accuracy : " << accuracy << std::endl;
+}
 
 int main() {
     {
         FA_SCOPE_TIMER("ForrAI-training-time")
 
-        fa::Perceptron perceptron(28 * 28, { 512, 256, 128 }); // total : 5 layers and 1 690 neurons
+        fa::Perceptron perceptron(28 * 28, { 512, 256, 128 }); // total : 5 layers and 1 690 neurons
 
         // Load MNIST data
         auto dataset = mnist::read_dataset<std::vector, std::vector, std::uint8_t, std::uint8_t>("Files/mnist_archive");
 
-        for (size_t epoch = 0; epoch < 10; epoch++) {
+        for (size_t epoch = 0; epoch < 100; epoch++) {
             FA_SCOPE_TIMER("Epoch " + std::to_string(epoch))
 
             auto zipped = std::views::zip(dataset.training_images, dataset.training_labels);
@@ -42,27 +61,15 @@ int main() {
             }
 
             if (epoch > 0 && epoch % 10 == 0) {
+                check_accuracy(perceptron, dataset);
+
                 fa::Serializer        serializer{ perceptron };
                 std::filesystem::path path = "ForrAI-epoch_" + std::to_string(epoch) + ".bin";
                 serializer.Write(path);
             }
         }
 
-        std::size_t correct_count{};
-        double      accuracy{};
-
-        for (std::size_t i = 0; i < dataset.test_images.size(); i++) {
-            const auto& image = dataset.test_images[i];
-            const auto& label = dataset.test_labels[i];
-
-            const auto  predictions = perceptron.forward(image);
-            std::size_t answer      = fa::classify(predictions);
-
-            correct_count += answer == label ? 1 : 0;
-        }
-
-        accuracy = static_cast<double>(correct_count) / dataset.test_images.size();
-        std::cerr << "Accuracy : " << accuracy << std::endl;
+        check_accuracy(perceptron, dataset);
 
         fa::Serializer        serializer{ perceptron };
         std::filesystem::path path = "ForrAI-final.bin";

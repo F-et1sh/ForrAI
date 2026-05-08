@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <iostream>
 #include <assert.h>
 #include <ranges>
@@ -55,16 +55,20 @@ namespace fa {
         Perceptron(const container_t<neuron_value_t>& values,
                    const container_t<neuron_value_t>& biases,
                    const container_t<neuron_value_t>& grad_biases,
+                   const container_t<neuron_value_t>& velocity_biases,
                    const container_t<neuron_value_t>& deltas,
                    const container_t<neuron_value_t>& weights,
                    const container_t<neuron_value_t>& grad_weights,
+                   const container_t<neuron_value_t>& velocity_weights,
                    const std::vector<Layer>&          layers_topology)
             : m_Values(values),
               m_Biases(biases),
               m_GradBiases(grad_biases),
+              m_VelocityBiases(velocity_biases),
               m_Deltas(deltas),
               m_Weights(weights),
               m_GradWeights(grad_weights),
+              m_VelocityWeights(velocity_weights),
               m_LayersTopology(layers_topology) {}
         ~Perceptron() = default;
 

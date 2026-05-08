@@ -1,4 +1,4 @@
-// first
+﻿// first
 [PROFILER].forward : 0.0337 ms
 [PROFILER].backward : 0.039 ms
 [PROFILER].step : 0.07 ms
@@ -338,3 +338,23 @@ Accuracy : 0.9826
 [PROFILER].Epoch 9 : 17017.5 ms
 Accuracy : 0.9817
 [PROFILER].ForrAI-training-time : 172642 ms
+
+// last training
+
+Accuracy : 0.9823
+[PROFILER].Epoch 150 : 18672.2 ms
+[PROFILER].Epoch 151 : 17691.8 ms
+[PROFILER].Epoch 152 : 18301.7 ms
+[PROFILER].Epoch 153 : 19362.2 ms
+[PROFILER].Epoch 154 : 18239.1 ms
+[PROFILER].Epoch 155 : 18140.5 ms
+[PROFILER].Epoch 156 : 18483.5 ms
+[PROFILER].Epoch 157 : 18161.5 ms
+[PROFILER].Epoch 158 : 17975.6 ms
+[PROFILER].Epoch 159 : 18135.6 ms
+Accuracy : 0.9823
+[PROFILER].Epoch 160 : 17697.8 ms
+[PROFILER].Epoch 161 : 16370.9 ms
+[PROFILER].Epoch 162 : 15992.6 ms
+[PROFILER].Epoch 163 : 16456.2 ms
+[PROFILER].Epoch 164 : 16140 ms
