@@ -11,6 +11,10 @@ namespace fa {
         void Update();
 
     private:
+        void checkCanvasDirty();
+        void checkIsReading();
+
+    private:
         ApplicationContext& m_Context;
 
         fa::Perceptron m_Perceptron{

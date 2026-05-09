@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <cmath>
 
+#include <Windows.h>
+#include <shobjidl.h>
+
 fa::GUI::GUI(ApplicationContext& context) : m_Context(context) {
     m_Window.create(sf::VideoMode({ 640, 480 }), "ForrAI");
     m_Window.setVerticalSyncEnabled(true);
@@ -51,7 +54,22 @@ void fa::GUI::DrawMainMenuBar() {
         if (ImGui::MenuItem("Save")) {
         }
 
-        if (ImGui::MenuItem("Load")) {
+        if (ImGui::MenuItem("Load")) { // TODO : collapse all of this. Unable to read
+            
+            auto path = this->openFile();
+
+            if (path.has_value()) {
+                if (m_Context.path_to_file.extension() != ".bin") {
+                    std::cerr << "error" << std::endl;
+                }
+                else {
+                    m_Context.path_to_file = path.value();
+                    m_Context.is_reading   = true;
+                }
+            }
+            else {
+                std::cerr << "error" << std::endl;
+            }
         }
 
         ImGui::EndMenu();
@@ -106,6 +124,11 @@ void fa::GUI::DrawCanvas() {
                                   mouse_position.x < canvas_screen_position.x + canvas_size.x &&
                                   mouse_position.y >= canvas_screen_position.y &&
                                   mouse_position.y < canvas_screen_position.y + canvas_size.y;
+
+    if (!ImGui::IsWindowHovered()) {
+        ImGui::End();
+        return;
+    }
 
     // brush resize
     if (is_mouse_inside_canvas) {
@@ -173,42 +196,41 @@ void fa::GUI::DrawPredictions() {
     ImGui::SetNextWindowPos(ImVec2(450, 20));
     ImGui::SetNextWindowSize(ImVec2(190, 460));
     ImGui::Begin("Output", nullptr, static_window_flags);
-    {
-        int answer = (int) fa::classify(m_Context.current_predictions);
 
-        ImGui::SetCursorPosY(40);
-        ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Predicted :");
+    int answer = (int) fa::classify(m_Context.current_predictions);
 
-        ImGui::SetWindowFontScale(4.0f);
-        ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2 - 20);
-        ImGui::Text("%d", answer);
-        ImGui::SetWindowFontScale(1.0f);
+    ImGui::SetCursorPosY(40);
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Predicted :");
 
-        ImGui::Separator();
-        ImGui::Spacing();
+    ImGui::SetWindowFontScale(4.0f);
+    ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2 - 20);
+    ImGui::Text("%d", answer);
+    ImGui::SetWindowFontScale(1.0f);
 
-        for (int i = 0; i < 10; i++) {
-            float prob = (float) m_Context.current_predictions[i];
-            if (prob < 0) prob = 0;
+    ImGui::Separator();
+    ImGui::Spacing();
 
-            ImGui::Text("%d:", i);
-            ImGui::SameLine();
+    for (int i = 0; i < 10; i++) {
+        float prediction = (float) m_Context.current_predictions[i];
 
-            if (i == answer)
-                ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
-            else
-                ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
+        ImGui::Text("%d:", i);
+        ImGui::SameLine();
 
-            ImGui::ProgressBar(prob, ImVec2(-1, 15), "");
-            ImGui::PopStyleColor();
-        }
+        if (i == answer)
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+        else
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
 
-        if (ImGui::Button("Clear All", ImVec2(-1, 30))) {
-            std::ranges::fill(m_Context.canvas_pixels, 0.0);
-            m_IsCanvasTextureDirty = true;
-            m_Context.is_canvas_dirty = true;
-        }
+        ImGui::ProgressBar(prediction, ImVec2(-1, 15), "");
+        ImGui::PopStyleColor();
     }
+
+    if (ImGui::Button("Clear All", ImVec2(-1, 30))) {
+        std::ranges::fill(m_Context.canvas_pixels, 0.0);
+        m_IsCanvasTextureDirty    = true;
+        m_Context.is_canvas_dirty = true;
+    }
+
     ImGui::End();
 }
 
@@ -262,8 +284,53 @@ void fa::GUI::applyBrush(int center_x, int center_y, float target_value) {
         }
     }
 
-    m_IsCanvasTextureDirty = true;
+    m_IsCanvasTextureDirty    = true;
     m_Context.is_canvas_dirty = true;
+}
+
+std::optional<std::filesystem::path> fa::GUI::openFile() const {
+    HRESULT f_sys_hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+    if (FAILED(f_sys_hr)) return std::nullopt;
+
+    IFileOpenDialog* f_file_system{};
+    f_sys_hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&f_file_system));
+    if (FAILED(f_sys_hr)) {
+        CoUninitialize();
+        return std::nullopt;
+    }
+
+    f_sys_hr = f_file_system->Show(NULL);
+    if (FAILED(f_sys_hr)) {
+        f_file_system->Release();
+        CoUninitialize();
+        return std::nullopt;
+    }
+
+    IShellItem* f_files{};
+    f_sys_hr = f_file_system->GetResult(&f_files);
+    if (FAILED(f_sys_hr)) {
+        f_file_system->Release();
+        CoUninitialize();
+        return std::nullopt;
+    }
+
+    PWSTR f_path{};
+    f_sys_hr = f_files->GetDisplayName(SIGDN_FILESYSPATH, &f_path);
+    if (FAILED(f_sys_hr)) {
+        f_files->Release();
+        f_file_system->Release();
+        CoUninitialize();
+        return std::nullopt;
+    }
+
+    std::filesystem::path path = f_path;
+
+    CoTaskMemFree(f_path);
+    f_files->Release();
+    f_file_system->Release();
+    CoUninitialize();
+
+    return path;
 }
 
 bool fa::GUI::isPixelInsideCanvas(int x, int y) const {

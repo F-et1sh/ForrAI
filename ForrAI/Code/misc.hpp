@@ -2,6 +2,7 @@
 #include <iostream>
 #include <array>
 #include <optional>
+#include <filesystem>
 
 namespace fa {
     template <class _Ty, class _Alloc = std::allocator<_Ty>>
@@ -13,7 +14,7 @@ namespace fa {
         constexpr static std::uint8_t canvas_width  = 28;
         constexpr static std::uint8_t canvas_height = 28;
 
-        constexpr static int brush_min_size = 1;
+        constexpr static int brush_min_size = 2;
         constexpr static int brush_max_size = 10;
 
         std::array<neuron_value_t, canvas_width * canvas_height> canvas_pixels{};
@@ -21,7 +22,10 @@ namespace fa {
 
         int brush_size = 2;
 
-        bool is_canvas_dirty{};
+        std::filesystem::path path_to_file{};
+
+        bool is_canvas_dirty = false;
+        bool is_reading      = false;
 
         ApplicationContext()  = default;
         ~ApplicationContext() = default;
