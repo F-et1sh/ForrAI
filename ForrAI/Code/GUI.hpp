@@ -25,15 +25,18 @@ namespace fa {
     private:
         void DrawMainMenuBar();
         void DrawCanvas();
+        void DrawPredictions();
 
+    private:
         void updateCanvasTexture();
         void applyBrush(int center_x, int center_y, float target_value);
-        
+
         bool isPixelInsideCanvas(int pixel_x, int pixel_y) const;
 
     private:
         ApplicationContext& m_Context;
 
+        bool   m_IsCanvasTextureDirty{};
         ImVec2 m_LastBrushCanvasPosition{};
 
         sf::Clock m_DeltaClock{};

@@ -1,11 +1,11 @@
 ﻿#pragma once
 #include "Perceptron.hpp"
-#include "misc.hpp"
+#include "Serializer.hpp"
 
 namespace fa {
     class BusinessLogic {
     public:
-        BusinessLogic(ApplicationContext& context) : m_Context(context) {}
+        BusinessLogic(ApplicationContext& context);
         ~BusinessLogic() = default;
 
         void Update();

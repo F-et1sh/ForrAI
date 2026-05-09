@@ -67,7 +67,7 @@ namespace fa {
 
                 auto past_layer_values = this->GetLayerValues(past_layer_topology);
 
-#pragma omp parallel for schedule(static)
+//#pragma omp parallel for schedule(static)
                 for (std::int64_t j = 0; j < this_layer_topology.values_count; j++) {
                     auto this_layer_neuron_weights = this->GetNeuronWeights(this_layer_topology, past_layer_topology, j);
 

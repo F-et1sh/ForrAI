@@ -37,6 +37,7 @@ void fa::GUI::Update() {
 
     this->DrawMainMenuBar();
     this->DrawCanvas();
+    this->DrawPredictions();
 
     m_Window.clear();
     ImGui::SFML::Render(m_Window);
@@ -159,13 +160,60 @@ void fa::GUI::DrawCanvas() {
         m_LastBrushCanvasPosition = ImVec2(-1.0f, -1.0f);
 
     // texture upload
-    if (m_Context.is_canvas_dirty) this->updateCanvasTexture();
+    this->updateCanvasTexture();
 
     ImGui::End();
 }
 
+void fa::GUI::DrawPredictions() {
+    constexpr static ImGuiWindowFlags static_window_flags = ImGuiWindowFlags_NoMove |
+                                                            ImGuiWindowFlags_NoResize |
+                                                            ImGuiWindowFlags_NoCollapse;
+
+    ImGui::SetNextWindowPos(ImVec2(450, 20));
+    ImGui::SetNextWindowSize(ImVec2(190, 460));
+    ImGui::Begin("Output", nullptr, static_window_flags);
+    {
+        int answer = (int) fa::classify(m_Context.current_predictions);
+
+        ImGui::SetCursorPosY(40);
+        ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Predicted :");
+
+        ImGui::SetWindowFontScale(4.0f);
+        ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2 - 20);
+        ImGui::Text("%d", answer);
+        ImGui::SetWindowFontScale(1.0f);
+
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        for (int i = 0; i < 10; i++) {
+            float prob = (float) m_Context.current_predictions[i];
+            if (prob < 0) prob = 0;
+
+            ImGui::Text("%d:", i);
+            ImGui::SameLine();
+
+            if (i == answer)
+                ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.2f, 0.8f, 0.2f, 1.0f));
+            else
+                ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
+
+            ImGui::ProgressBar(prob, ImVec2(-1, 15), "");
+            ImGui::PopStyleColor();
+        }
+
+        if (ImGui::Button("Clear All", ImVec2(-1, 30))) {
+            std::ranges::fill(m_Context.canvas_pixels, 0.0);
+            m_IsCanvasTextureDirty = true;
+            m_Context.is_canvas_dirty = true;
+        }
+    }
+    ImGui::End();
+}
+
 void fa::GUI::updateCanvasTexture() {
-    if (!m_Context.is_canvas_dirty) return;
+    if (!m_IsCanvasTextureDirty) return;
 
     constexpr static std::uint8_t alpha = 255;
 
@@ -184,7 +232,7 @@ void fa::GUI::updateCanvasTexture() {
 
     m_CanvasTexture.update(m_TexturePixels.data());
 
-    m_Context.is_canvas_dirty = false;
+    m_IsCanvasTextureDirty = false;
 }
 
 void fa::GUI::applyBrush(int center_x, int center_y, float target_value) {
@@ -214,6 +262,7 @@ void fa::GUI::applyBrush(int center_x, int center_y, float target_value) {
         }
     }
 
+    m_IsCanvasTextureDirty = true;
     m_Context.is_canvas_dirty = true;
 }
 
