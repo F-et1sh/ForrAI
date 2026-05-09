@@ -47,16 +47,19 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SFML_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(ProjectDir)Code;$(SolutionDir)\ThirdParty\mnist\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Code;$(SolutionDir)ThirdParty\mnist\include;$(SolutionDir)ThirdParty\imgui\include;$(SolutionDir)ThirdParty\imgui-sfml\include;$(SolutionDir)ThirdParty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\SFML\win64_debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;winmm.lib;gdi32.lib;sfml-graphics-s-d.lib;sfml-window-s-d.lib;sfml-system-s-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>call "$(SolutionDir)Scripts\collect_licenses.bat" "$(TargetDir)" "$(SolutionDir)"</Command>
@@ -67,16 +70,19 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SFML_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(ProjectDir)Code;$(SolutionDir)\ThirdParty\mnist\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Code;$(SolutionDir)ThirdParty\mnist\include;$(SolutionDir)ThirdParty\imgui\include;$(SolutionDir)ThirdParty\imgui-sfml\include;$(SolutionDir)ThirdParty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\SFML\win64_min_size_rel;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;winmm.lib;gdi32.lib;sfml-graphics-s.lib;sfml-window-s.lib;sfml-system-s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>call "$(SolutionDir)Scripts\collect_licenses.bat" "$(TargetDir)" "$(SolutionDir)"</Command>
@@ -86,6 +92,12 @@
     <None Include="sources-from-artickle\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\ThirdParty\imgui-sfml\include\imgui-SFML.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui\include\imgui.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui\include\imgui_demo.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui\include\imgui_draw.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui\include\imgui_tables.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui\include\imgui_widgets.cpp" />
     <ClCompile Include="Code\Perceptron.cpp" />
     <None Include="old\core.cpp" />
     <ClCompile Include="Code\main.cpp" />

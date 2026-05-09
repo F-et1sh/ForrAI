@@ -1,3 +1,12 @@
 [submodule "External/mnist"]
 	path = External/mnist
 	url = https://github.com/wichtounet/mnist.git
+[submodule "External/imgui"]
+	path = External/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "External/imgui-sfml"]
+	path = External/imgui-sfml
+	url = https://github.com/SFML/imgui-sfml.git
+[submodule "External/SFML"]
+	path = External/SFML
+	url = https://github.com/SFML/SFML.git

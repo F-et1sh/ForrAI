@@ -22,6 +22,23 @@ void check_accuracy(fa::Perceptron& perceptron, T& dataset) {
     std::cerr << "Accuracy : " << accuracy << std::endl;
 }
 
+template <typename T>
+void show_accuracy_picture_by_picture(fa::Perceptron& perceptron, T& dataset) {
+    for (std::size_t i = 0; i < dataset.test_images.size(); i++) {
+        const auto& image = dataset.test_images[i];
+        const auto& label = dataset.test_labels[i];
+
+        const auto  predictions = perceptron.forward(image);
+        std::size_t answer      = fa::classify(predictions);
+
+        fa::print_image(image);
+
+        std::cerr << "Predicted : " << answer << "\nTarget : " << label << std::endl;
+
+        (void)std::getchar();
+    }
+}
+
 int main() {
     {
         FA_SCOPE_TIMER("ForrAI-training-time")
@@ -70,6 +87,8 @@ int main() {
         }
 
         check_accuracy(perceptron, dataset);
+
+        show_accuracy_picture_by_picture(perceptron, dataset);
 
         fa::Serializer        serializer{ perceptron };
         std::filesystem::path path = "ForrAI-final.bin";

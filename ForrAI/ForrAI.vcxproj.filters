@@ -17,5 +17,11 @@
   <ItemGroup>
     <ClCompile Include="Code\main.cpp" />
     <ClCompile Include="Code\Perceptron.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui\include\imgui.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui\include\imgui_demo.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui\include\imgui_tables.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui\include\imgui_widgets.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui\include\imgui_draw.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui-sfml\include\imgui-SFML.cpp" />
   </ItemGroup>
 </Project>
