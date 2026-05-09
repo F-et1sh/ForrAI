@@ -3,6 +3,14 @@
 #include "Perceptron.hpp"
 #include "Serializer.hpp"
 
+#include "imgui.h"
+#include "imgui-SFML.h"
+
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/System/Clock.hpp>
+#include <SFML/Window/Event.hpp>
+
 template <typename T>
 void check_accuracy(fa::Perceptron& perceptron, T& dataset) {
     std::size_t correct_count{};
@@ -33,69 +41,38 @@ void show_accuracy_picture_by_picture(fa::Perceptron& perceptron, T& dataset) {
 
         fa::print_image(image);
 
-        std::cerr << "Predicted : " << answer << "\nTarget : " << label << std::endl;
+        std::cerr << "Predicted : " << answer << "\nTarget : " << static_cast<std::size_t>(label) << std::endl;
 
-        (void)std::getchar();
+        (void) std::getchar();
     }
 }
 
 int main() {
-    {
-        FA_SCOPE_TIMER("ForrAI-training-time")
+    sf::RenderWindow window(sf::VideoMode({ 640, 480 }), "ImGui + SFML = <3");
+    window.setVerticalSyncEnabled(true);
+    ImGui::SFML::Init(window);
 
-        fa::Perceptron perceptron(28 * 28, { 512, 256, 128 }); // total : 5 layers and 1 690 neurons
+    sf::Clock delta_clock{};
 
-        // Load MNIST data
-        auto dataset = mnist::read_dataset<std::vector, std::vector, std::uint8_t, std::uint8_t>("Files/mnist_archive");
+    while (window.isOpen()) {
+        while (const auto event = window.pollEvent()) {
+            ImGui::SFML::ProcessEvent(window, *event);
 
-        for (size_t epoch = 0; epoch < 100; epoch++) {
-            FA_SCOPE_TIMER("Epoch " + std::to_string(epoch))
-
-            auto zipped = std::views::zip(dataset.training_images, dataset.training_labels);
-
-            static std::mt19937 gen{ std::random_device{}() };
-            std::ranges::shuffle(zipped, gen);
-
-            fa::neuron_value_t current_learning_rate = static_cast<fa::neuron_value_t>(0.069f * std::exp(-0.1f * epoch));
-
-            for (std::size_t i = 0; i < dataset.training_images.size(); i++) {
-                const auto& image = dataset.training_images[i];
-                const auto& label = dataset.training_labels[i];
-
-                const auto                         predictions = perceptron.forward(image);
-                std::array<fa::neuron_value_t, 10> error_singal{};
-
-                for (std::size_t j = 0; j < predictions.size(); j++) {
-                    float target    = (j == label) ? 1.0f : 0.0f;
-                    error_singal[j] = predictions[j] - target;
-                }
-
-                perceptron.backward(error_singal);
-
-                if (i > 0 && i % 32 == 0) {
-                    perceptron.step(current_learning_rate / 32.0);
-                }
-            }
-
-            if (epoch > 0 && epoch % 10 == 0) {
-                check_accuracy(perceptron, dataset);
-
-                fa::Serializer        serializer{ perceptron };
-                std::filesystem::path path = "ForrAI-epoch_" + std::to_string(epoch) + ".bin";
-                serializer.Write(path);
+            if (event->is<sf::Event::Closed>()) {
+                window.close();
             }
         }
 
-        check_accuracy(perceptron, dataset);
+        ImGui::SFML::Update(window, delta_clock.restart());
 
-        show_accuracy_picture_by_picture(perceptron, dataset);
+        // ...
 
-        fa::Serializer        serializer{ perceptron };
-        std::filesystem::path path = "ForrAI-final.bin";
-        serializer.Write(path);
+        window.clear();
+        ImGui::SFML::Render(window);
+        window.display();
     }
 
-    std::system("pause");
+    ImGui::SFML::Shutdown();
 
     return 0;
 }

@@ -76,10 +76,13 @@ namespace fa {
         std::array<neuron_value_t, 10> forward(const Container<Value>& input_data) {
             //FA_SCOPE_TIMER("forward")
 
-            constexpr float value_max = std::numeric_limits<Value>::max();
+            float dataset_value_type_max = std::numeric_limits<Value>::max();
+            auto  max_element            = std::ranges::max_element(input_data);
+            if (static_cast<float>(*max_element) <= 1.0f)
+                dataset_value_type_max = 1.0f; // already normalized
 
             for (std::size_t i = 0; i < input_data.size(); i++)
-                m_Values[i] = static_cast<float>(input_data[i]) / value_max;
+                m_Values[i] = static_cast<float>(input_data[i]) / dataset_value_type_max; // put and normalize
 
             for (std::size_t i = 1; i < m_LayersTopology.size(); i++) {
                 const auto& this_layer_topology = m_LayersTopology[i];
