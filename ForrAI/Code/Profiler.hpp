@@ -1,8 +1,8 @@
-#pragma once
+﻿#pragma once
 #include <iostream>
 #include <chrono>
 
-#include "tools.hpp"
+#include "misc.hpp"
 
 namespace fa {
     class TimeScope {

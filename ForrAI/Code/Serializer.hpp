@@ -2,7 +2,6 @@
 #include <fstream>
 #include <filesystem>
 
-#include "tools.hpp"
 #include "Perceptron.hpp"
 
 namespace fa {

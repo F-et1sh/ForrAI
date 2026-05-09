@@ -12,7 +12,9 @@
     <ClInclude Include="Code\Perceptron.hpp" />
     <ClInclude Include="Code\Profiler.hpp" />
     <ClInclude Include="Code\Serializer.hpp" />
-    <ClInclude Include="Code\tools.hpp" />
+    <ClInclude Include="Code\misc.hpp" />
+    <ClInclude Include="Code\GUI.hpp" />
+    <ClInclude Include="Code\BusinessLogic.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\main.cpp" />
@@ -23,5 +25,7 @@
     <ClCompile Include="..\ThirdParty\imgui\include\imgui_widgets.cpp" />
     <ClCompile Include="..\ThirdParty\imgui\include\imgui_draw.cpp" />
     <ClCompile Include="..\ThirdParty\imgui-sfml\include\imgui-SFML.cpp" />
+    <ClCompile Include="Code\GUI.cpp" />
+    <ClCompile Include="Code\BusinessLogic.cpp" />
   </ItemGroup>
 </Project>

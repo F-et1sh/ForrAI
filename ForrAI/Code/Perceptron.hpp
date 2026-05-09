@@ -10,34 +10,6 @@
 #include "Profiler.hpp"
 
 namespace fa {
-    template <class _Ty, class _Alloc = std::allocator<_Ty>>
-    using container_t    = std::vector<_Ty, _Alloc>;
-    using neuron_value_t = float;
-
-    static std::size_t classify(const std::array<neuron_value_t, 10>& predictions) {
-        std::size_t    result = 0;
-        neuron_value_t max    = predictions[0];
-
-        for (std::size_t i = 1; i < predictions.size(); i++) {
-            if (predictions[i] > max) {
-                max    = predictions[i];
-                result = i;
-            }
-        }
-        return result;
-    }
-
-    template <template <typename...> class Container = std::vector, typename Value = uint8_t>
-    static void print_image(const Container<Value>& image) {
-        for (size_t i = 0; i < image.size(); i++) {
-            std::cerr << (image[i] > 0.5 ? "X" : " ");
-            if (i > 0 && i % 28 == 0) {
-                std::cerr << std::endl;
-            }
-        }
-        std::cerr << std::endl;
-    }
-
     class Perceptron {
     public:
         struct Layer {
@@ -51,7 +23,12 @@ namespace fa {
         };
 
     public:
-        Perceptron(std::size_t input_layer_neurons_count, std::vector<std::size_t> hidden_layers);
+        template <template <typename...> class Container = std::vector>
+        Perceptron(std::size_t input_layer_neurons_count, const Container<std::size_t>& hidden_layers) {
+            this->create_layer(input_layer_neurons_count);
+            for (auto e : hidden_layers) this->create_layer(e);
+            this->create_layer(10);
+        }
         Perceptron(const container_t<neuron_value_t>& values,
                    const container_t<neuron_value_t>& biases,
                    const container_t<neuron_value_t>& grad_biases,

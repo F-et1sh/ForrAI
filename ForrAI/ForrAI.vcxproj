@@ -98,6 +98,8 @@
     <ClCompile Include="..\ThirdParty\imgui\include\imgui_draw.cpp" />
     <ClCompile Include="..\ThirdParty\imgui\include\imgui_tables.cpp" />
     <ClCompile Include="..\ThirdParty\imgui\include\imgui_widgets.cpp" />
+    <ClCompile Include="Code\BusinessLogic.cpp" />
+    <ClCompile Include="Code\GUI.cpp" />
     <ClCompile Include="Code\Perceptron.cpp" />
     <None Include="old\core.cpp" />
     <ClCompile Include="Code\main.cpp" />
@@ -105,9 +107,11 @@
     <None Include="old\RegressionModel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Code\BusinessLogic.hpp" />
+    <ClInclude Include="Code\GUI.hpp" />
     <ClInclude Include="Code\Profiler.hpp" />
     <ClInclude Include="Code\Serializer.hpp" />
-    <ClInclude Include="Code\tools.hpp" />
+    <ClInclude Include="Code\misc.hpp" />
     <None Include="old\core.hpp" />
     <ClInclude Include="Code\Perceptron.hpp" />
     <None Include="old\RegressionModel.hpp" />
