@@ -10,11 +10,16 @@ namespace fa {
 
     struct ApplicationContext {
     public:
-        constexpr static uint8_t picture_width  = 28;
-        constexpr static uint8_t picture_height = 28;
+        constexpr static std::uint8_t canvas_width  = 28;
+        constexpr static std::uint8_t canvas_height = 28;
 
-        std::array<float, picture_width * picture_height> canvas_pixels{};
-        std::array<float, 10>                             current_predictions{};
+        constexpr static int brush_min_size = 1;
+        constexpr static int brush_max_size = 10;
+
+        std::array<neuron_value_t, canvas_width * canvas_height> canvas_pixels{};
+        std::array<float, 10>                                    current_predictions{};
+
+        int brush_size = 2;
 
         bool is_canvas_dirty{};
 
@@ -35,7 +40,7 @@ namespace fa {
         return result;
     }
 
-    template <template <typename...> class Container = std::vector, typename Value = uint8_t>
+    template <template <typename...> class Container = std::vector, typename Value = std::uint8_t>
     static void print_image(const Container<Value>& image) {
         for (size_t i = 0; i < image.size(); i++) {
             std::cerr << (image[i] > 0.5 ? "X" : " ");

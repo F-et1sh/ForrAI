@@ -1,5 +1,11 @@
 ﻿#include "Perceptron.hpp"
 
+fa::Perceptron::Perceptron(std::size_t input_layer_neurons_count, std::vector<std::size_t> hidden_layers) {
+    this->create_layer(input_layer_neurons_count);
+    for (auto e : hidden_layers) this->create_layer(e);
+    this->create_layer(10);
+}
+
 void fa::Perceptron::backward(const std::array<neuron_value_t, 10>& error_signal) {
     //FA_SCOPE_TIMER("backward")
 

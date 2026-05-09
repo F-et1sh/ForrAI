@@ -23,12 +23,7 @@ namespace fa {
         };
 
     public:
-        template <template <typename...> class Container = std::vector>
-        Perceptron(std::size_t input_layer_neurons_count, const Container<std::size_t>& hidden_layers) {
-            this->create_layer(input_layer_neurons_count);
-            for (auto e : hidden_layers) this->create_layer(e);
-            this->create_layer(10);
-        }
+        Perceptron(std::size_t input_layer_neurons_count, std::vector<std::size_t> hidden_layers);
         Perceptron(const container_t<neuron_value_t>& values,
                    const container_t<neuron_value_t>& biases,
                    const container_t<neuron_value_t>& grad_biases,
@@ -49,17 +44,19 @@ namespace fa {
               m_LayersTopology(layers_topology) {}
         ~Perceptron() = default;
 
-        template <template <typename...> class Container = std::vector, typename Value = uint8_t>
-        std::array<neuron_value_t, 10> forward(const Container<Value>& input_data) {
+        template <std::ranges::contiguous_range Range>
+        std::array<neuron_value_t, 10> forward(const Range& input_data) {
             //FA_SCOPE_TIMER("forward")
 
-            float dataset_value_type_max = std::numeric_limits<Value>::max();
-            auto  max_element            = std::ranges::max_element(input_data);
-            if (static_cast<float>(*max_element) <= 1.0f)
-                dataset_value_type_max = 1.0f; // already normalized
+            using Value                        = std::ranges::range_value_t<Range>;
+            std::size_t dataset_value_type_max = std::numeric_limits<Value>::max();
+            auto        max_element            = std::ranges::max_element(input_data);
+            auto        min_element            = std::ranges::min_element(input_data);
+            if (static_cast<neuron_value_t>(*max_element) <= 1.0 &&
+                static_cast<neuron_value_t>(*min_element) >= 0.0) dataset_value_type_max = 1; // already normalized
 
             for (std::size_t i = 0; i < input_data.size(); i++)
-                m_Values[i] = static_cast<float>(input_data[i]) / dataset_value_type_max; // put and normalize
+                m_Values[i] = static_cast<neuron_value_t>(input_data[i]) / dataset_value_type_max; // put and normalize
 
             for (std::size_t i = 1; i < m_LayersTopology.size(); i++) {
                 const auto& this_layer_topology = m_LayersTopology[i];
