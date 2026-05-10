@@ -51,15 +51,15 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(ProjectDir)Code;$(SolutionDir)ThirdParty\mnist\include;$(SolutionDir)ThirdParty\imgui\include;$(SolutionDir)ThirdParty\imgui-sfml\include;$(SolutionDir)ThirdParty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Code;$(SolutionDir)ThirdParty\mnist\include;$(SolutionDir)ThirdParty\imgui\include;$(SolutionDir)ThirdParty\imgui-sfml\include;$(SolutionDir)ThirdParty\SFML\include;$(SolutionDir)ThirdParty\freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\SFML\win64_debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;winmm.lib;gdi32.lib;sfml-graphics-s-d.lib;sfml-window-s-d.lib;sfml-system-s-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\SFML\win64_debug;$(SolutionDir)ThirdParty\freetype\win64_debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;winmm.lib;gdi32.lib;freetype.lib;harfbuzz.lib;brotlidec.lib;brotlicommon.lib;zlib.lib;sfml-graphics-s-d.lib;sfml-window-s-d.lib;sfml-system-s-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>call "$(SolutionDir)Scripts\collect_licenses.bat" "$(TargetDir)" "$(SolutionDir)"</Command>
@@ -74,15 +74,15 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(ProjectDir)Code;$(SolutionDir)ThirdParty\mnist\include;$(SolutionDir)ThirdParty\imgui\include;$(SolutionDir)ThirdParty\imgui-sfml\include;$(SolutionDir)ThirdParty\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Code;$(SolutionDir)ThirdParty\mnist\include;$(SolutionDir)ThirdParty\imgui\include;$(SolutionDir)ThirdParty\imgui-sfml\include;$(SolutionDir)ThirdParty\SFML\include;$(SolutionDir)ThirdParty\freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\SFML\win64_min_size_rel;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;winmm.lib;gdi32.lib;sfml-graphics-s.lib;sfml-window-s.lib;sfml-system-s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)ThirdParty\SFML\win64_min_size_rel;$(SolutionDir)ThirdParty\freetype\win64_min_size_rel;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;winmm.lib;gdi32.lib;freetype.lib;harfbuzz.lib;brotlidec.lib;brotlicommon.lib;zlib.lib;sfml-graphics-s.lib;sfml-window-s.lib;sfml-system-s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>call "$(SolutionDir)Scripts\collect_licenses.bat" "$(TargetDir)" "$(SolutionDir)"</Command>
@@ -96,6 +96,7 @@
     <ClCompile Include="..\ThirdParty\imgui\include\imgui.cpp" />
     <ClCompile Include="..\ThirdParty\imgui\include\imgui_demo.cpp" />
     <ClCompile Include="..\ThirdParty\imgui\include\imgui_draw.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui\include\imgui_freetype.cpp" />
     <ClCompile Include="..\ThirdParty\imgui\include\imgui_tables.cpp" />
     <ClCompile Include="..\ThirdParty\imgui\include\imgui_widgets.cpp" />
     <ClCompile Include="Code\BusinessLogic.cpp" />

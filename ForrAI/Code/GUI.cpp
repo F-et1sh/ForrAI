@@ -10,7 +10,34 @@ fa::GUI::GUI(ApplicationContext& context) : m_Context(context) {
     m_Window.create(sf::VideoMode({ 640, 480 }), "ForrAI");
     m_Window.setVerticalSyncEnabled(true);
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
     ImGui::SFML::Init(m_Window);
+
+    ImGuiIO& io    = ImGui::GetIO();
+    io.IniFilename = nullptr;
+
+    ImFontConfig font_config{};
+    font_config.FontLoaderFlags = ImGuiFreeTypeLoaderFlags_NoHinting |
+                                  ImGuiFreeTypeLoaderFlags_MonoHinting |
+                                  ImGuiFreeTypeLoaderFlags_Bold;
+
+    io.Fonts->SetFontLoader(ImGuiFreeType::GetFontLoader());
+
+    ImFont* font = io.Fonts->AddFontFromFileTTF(
+        m_Context.font_path.string().c_str(),
+        36.0f,
+        &font_config,
+        io.Fonts->GetGlyphRangesDefault());
+
+    if (font) {
+        io.FontDefault     = font;
+        io.FontGlobalScale = 0.5f;
+    }
+
+    if (!ImGui::SFML::UpdateFontTexture()) {
+        m_Context.error_message = "error";
+    }
 
     m_CanvasTexture.resize(sf::Vector2u(fa::ApplicationContext::canvas_width, fa::ApplicationContext::canvas_height));
     m_CanvasTexture.setSmooth(false);
@@ -38,9 +65,26 @@ void fa::GUI::Update() {
 
     ImGui::SFML::Update(m_Window, m_DeltaClock.restart());
 
+    // begin background window
+    {
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+        ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
+                                 ImGuiWindowFlags_NoResize |
+                                 ImGuiWindowFlags_NoMove |
+                                 ImGuiWindowFlags_NoScrollbar |
+                                 ImGuiWindowFlags_NoCollapse |
+                                 ImGuiWindowFlags_NoBringToFrontOnFocus |
+                                 ImGuiWindowFlags_NoNavFocus;
+
+        ImGui::Begin("##ui", nullptr, flags);
+    }
+
     this->DrawMainMenuBar();
     this->DrawCanvas();
     this->DrawPredictions();
+
+    ImGui::End();
 
     m_Window.clear();
     ImGui::SFML::Render(m_Window);
@@ -55,17 +99,12 @@ void fa::GUI::DrawMainMenuBar() {
         }
 
         if (ImGui::MenuItem("Load")) { // TODO : collapse all of this. Unable to read
-            
+
             auto path = this->openFile();
 
             if (path.has_value()) {
-                if (m_Context.path_to_file.extension() != ".bin") {
-                    std::cerr << "error" << std::endl;
-                }
-                else {
-                    m_Context.path_to_file = path.value();
-                    m_Context.is_reading   = true;
-                }
+                m_Context.path_to_file = path.value();
+                m_Context.is_reading   = true;
             }
             else {
                 std::cerr << "error" << std::endl;
@@ -126,6 +165,9 @@ void fa::GUI::DrawCanvas() {
                                   mouse_position.y < canvas_screen_position.y + canvas_size.y;
 
     if (!ImGui::IsWindowHovered()) {
+        // texture upload
+        this->updateCanvasTexture();
+
         ImGui::End();
         return;
     }
@@ -146,7 +188,7 @@ void fa::GUI::DrawCanvas() {
         draw_list->AddCircle(mouse_position, visual_radius, IM_COL32(255, 255, 0, 180), 16, 2.0f);
     }
 
-    // drawing
+    // drawing by brush
     bool is_drawing = ImGui::IsMouseDown(ImGuiMouseButton_Left) ||
                       ImGui::IsMouseDown(ImGuiMouseButton_Right);
 

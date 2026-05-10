@@ -23,4 +23,6 @@ void fa::BusinessLogic::checkIsReading() {
     serializer.Read(m_Context.path_to_file);
 
     m_Context.is_reading = false;
+
+    m_Context.is_canvas_dirty = true; // update predictions
 }

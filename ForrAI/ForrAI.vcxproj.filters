@@ -27,5 +27,6 @@
     <ClCompile Include="..\ThirdParty\imgui-sfml\include\imgui-SFML.cpp" />
     <ClCompile Include="Code\GUI.cpp" />
     <ClCompile Include="Code\BusinessLogic.cpp" />
+    <ClCompile Include="..\ThirdParty\imgui\include\imgui_freetype.cpp" />
   </ItemGroup>
 </Project>

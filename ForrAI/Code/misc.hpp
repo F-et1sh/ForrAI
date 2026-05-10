@@ -11,21 +11,24 @@ namespace fa {
 
     struct ApplicationContext {
     public:
-        constexpr static std::uint8_t canvas_width  = 28;
-        constexpr static std::uint8_t canvas_height = 28;
-
         constexpr static int brush_min_size = 2;
         constexpr static int brush_max_size = 10;
+        int                  brush_size     = 2;
 
+        std::filesystem::path font_path = "Files/Fonts/OpenSans/open_sans.ttf";
+
+        std::array<float, 10> current_predictions{};
+
+        std::string           error_message{}; // drawing this if not empty
+        std::filesystem::path path_to_file{};  // using this to write or read if flags ( is_reading/is_writing ) are active
+
+        constexpr static std::uint8_t                            canvas_width  = 28;
+        constexpr static std::uint8_t                            canvas_height = 28;
         std::array<neuron_value_t, canvas_width * canvas_height> canvas_pixels{};
-        std::array<float, 10>                                    current_predictions{};
-
-        int brush_size = 2;
-
-        std::filesystem::path path_to_file{};
 
         bool is_canvas_dirty = false;
         bool is_reading      = false;
+        bool is_writing      = false;
 
         ApplicationContext()  = default;
         ~ApplicationContext() = default;

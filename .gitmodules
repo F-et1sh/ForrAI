@@ -10,3 +10,6 @@
 [submodule "External/SFML"]
 	path = External/SFML
 	url = https://github.com/SFML/SFML.git
+[submodule "External/freetype"]
+	path = External/freetype
+	url = https://github.com/freetype/freetype.git

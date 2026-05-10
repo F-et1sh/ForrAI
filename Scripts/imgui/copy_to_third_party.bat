@@ -2,6 +2,8 @@
 
 @echo off
 
+xcopy /y /i /s "..\\..\\External\\imgui\\misc\\freetype\\imgui_freetype.h" "..\\..\\ThirdParty\\imgui\\include\\" >nul
+xcopy /y /i /s "..\\..\\External\\imgui\\misc\\freetype\\imgui_freetype.cpp" "..\\..\\ThirdParty\\imgui\\include\\" >nul
 xcopy /y /i /s "..\\..\\External\\imgui\\imconfig.h" "..\\..\\ThirdParty\\imgui\\include\\" >nul
 xcopy /y /i /s "..\\..\\External\\imgui\\imgui.cpp" "..\\..\\ThirdParty\\imgui\\include\\" >nul
 xcopy /y /i /s "..\\..\\External\\imgui\\imgui.h" "..\\..\\ThirdParty\\imgui\\include\\" >nul
