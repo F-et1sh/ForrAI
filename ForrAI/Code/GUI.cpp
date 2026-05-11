@@ -17,26 +17,29 @@ fa::GUI::GUI(ApplicationContext& context) : m_Context(context) {
     ImGuiIO& io    = ImGui::GetIO();
     io.IniFilename = nullptr;
 
-    ImFontConfig font_config{};
-    font_config.FontLoaderFlags = ImGuiFreeTypeLoaderFlags_NoHinting |
-                                  ImGuiFreeTypeLoaderFlags_MonoHinting |
-                                  ImGuiFreeTypeLoaderFlags_Bold;
+    if (std::filesystem::exists(m_Context.font_path)) {
+        ImFontConfig font_config{};
+        font_config.FontLoaderFlags = ImGuiFreeTypeLoaderFlags_NoHinting |
+                                      ImGuiFreeTypeLoaderFlags_MonoHinting |
+                                      ImGuiFreeTypeLoaderFlags_Bold;
 
-    io.Fonts->SetFontLoader(ImGuiFreeType::GetFontLoader());
+        io.Fonts->SetFontLoader(ImGuiFreeType::GetFontLoader());
 
-    ImFont* font = io.Fonts->AddFontFromFileTTF(
-        m_Context.font_path.string().c_str(),
-        36.0f,
-        &font_config,
-        io.Fonts->GetGlyphRangesDefault());
+        ImFont* font = io.Fonts->AddFontFromFileTTF(m_Context.font_path.string().c_str(),
+                                                    36.0f,
+                                                    &font_config,
+                                                    io.Fonts->GetGlyphRangesDefault());
+        if (font) {
+            io.FontDefault     = font;
+            io.FontGlobalScale = 0.5f;
 
-    if (font) {
-        io.FontDefault     = font;
-        io.FontGlobalScale = 0.5f;
+            if (!ImGui::SFML::UpdateFontTexture()) {
+                reportError(m_Context, "Failed to setup font. Failed to update font texture for ImGui::SFML.\nUsing default font");
+            }
+        }
     }
-
-    if (!ImGui::SFML::UpdateFontTexture()) {
-        m_Context.error_message = "error";
+    else {
+        reportError(m_Context, "Failed to setup font. File does not exist.\nUsing default font\nPath : " + m_Context.font_path.string());
     }
 
     m_CanvasTexture.resize(sf::Vector2u(fa::ApplicationContext::canvas_width, fa::ApplicationContext::canvas_height));
@@ -84,6 +87,41 @@ void fa::GUI::Update() {
     this->DrawCanvas();
     this->DrawPredictions();
 
+    if (!m_Context.error_message.empty() && m_Context.error_displaying_time > 0.0f) {
+        ImGuiIO& io = ImGui::GetIO();
+
+        float moving_offset = std::clamp(m_Context.error_displaying_time * 15, 2.0f, 25.0f);
+
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f,
+                                       io.DisplaySize.y - 40.0f - moving_offset + 2.0f),
+                                ImGuiCond_Always,
+                                ImVec2(0.5f, 0.5f));
+
+        ImGuiWindowFlags error_flags = ImGuiWindowFlags_NoTitleBar |
+                                       ImGuiWindowFlags_NoScrollbar |
+                                       ImGuiWindowFlags_NoCollapse |
+                                       ImGuiWindowFlags_NoFocusOnAppearing |
+                                       ImGuiWindowFlags_NoNav |
+                                       ImGuiWindowFlags_NoInputs |
+                                       ImGuiWindowFlags_Tooltip;
+
+        float alpha = m_Context.error_displaying_time;
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+
+        ImGui::Begin("##ErrorMessage", nullptr, error_flags);
+        ImGui::TextColored(ImVec4(0.9f, 0.22f, 0.2f, 1.0f), "ERROR : %s", m_Context.error_message.c_str());
+        ImGui::End();
+
+        ImGui::PopStyleVar();
+
+        constexpr static float window_collapsing_speed = 1.5f;
+
+        m_Context.error_displaying_time = std::max(0.0f, m_Context.error_displaying_time - window_collapsing_speed * io.DeltaTime);
+    }
+    else {
+        m_Context.error_message.clear();
+    }
+
     ImGui::End();
 
     m_Window.clear();
@@ -94,45 +132,59 @@ void fa::GUI::Update() {
 void fa::GUI::DrawMainMenuBar() {
     if (!ImGui::BeginMainMenuBar()) return;
 
-    if (ImGui::BeginMenu("File")) {
-        if (ImGui::MenuItem("Save")) {
-        }
-
-        if (ImGui::MenuItem("Load")) { // TODO : collapse all of this. Unable to read
-
-            auto path = this->openFile();
-
-            if (path.has_value()) {
-                m_Context.path_to_file = path.value();
-                m_Context.is_reading   = true;
-            }
-            else {
-                std::cerr << "error" << std::endl;
-            }
-        }
-
-        ImGui::EndMenu();
+    if (!ImGui::BeginMenu("File")) {
+        ImGui::EndMainMenuBar();
+        return;
     }
+
+    //if (ImGui::MenuItem("Save")) {
+    //}
+
+    if (ImGui::MenuItem("Load")) {
+
+        auto path = this->openFile();
+
+        if (path.has_value()) {
+            m_Context.path_to_file = path.value();
+            m_Context.is_reading   = true;
+        }
+    }
+
+    ImGui::EndMenu();
 
     ImGui::EndMainMenuBar();
 }
 
 void fa::GUI::DrawCanvas() {
-    constexpr static float            canvas_scale        = 15.0f;
-    constexpr static ImGuiWindowFlags static_window_flags = ImGuiWindowFlags_NoMove |
-                                                            ImGuiWindowFlags_NoResize |
-                                                            ImGuiWindowFlags_NoCollapse;
+    float available_width  = ImGui::GetContentRegionAvail().x;
+    float available_height = ImGui::GetContentRegionAvail().y;
 
-    ImGui::SetNextWindowPos(ImVec2(0.0f, 20.0f));
-    ImGui::SetNextWindowSize(ImVec2(450.0f, 460.0f));
+    float scale_x = available_width / static_cast<float>(fa::ApplicationContext::canvas_width);
+    float scale_y = available_height / static_cast<float>(fa::ApplicationContext::canvas_height);
+
+    float pixel_size = std::floor(std::min(scale_x, scale_y));
+
+    constexpr static ImGuiWindowFlags static_window_flags = ImGuiWindowFlags_NoMove |
+                                                            ImGuiWindowFlags_NoCollapse |
+                                                            ImGuiWindowFlags_NoScrollbar |
+                                                            ImGuiWindowFlags_NoScrollWithMouse;
+
+    ImVec2 display_size    = ImGui::GetIO().DisplaySize;
+    float  menu_bar_height = ImGui::GetFrameHeight();
+    float  output_width    = display_size.x * 0.3f;
+    float  canvas_width    = display_size.x - output_width;
+    float  content_height  = display_size.y - menu_bar_height;
+
+    ImGui::SetNextWindowPos(ImVec2(0.0f, menu_bar_height));
+    ImGui::SetNextWindowSize(ImVec2(canvas_width, content_height));
 
     ImGui::Begin("Canvas", nullptr, static_window_flags);
 
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
     ImVec2 canvas_screen_position = ImGui::GetCursorScreenPos();
-    ImVec2 canvas_size            = ImVec2(fa::ApplicationContext::canvas_width * canvas_scale,
-                                           fa::ApplicationContext::canvas_height * canvas_scale);
+    ImVec2 canvas_size            = ImVec2(fa::ApplicationContext::canvas_width * pixel_size,
+                                           fa::ApplicationContext::canvas_height * pixel_size);
 
     // draw the canvas
     ImGui::Image(m_CanvasTexture, sf::Vector2f(canvas_size.x, canvas_size.y));
@@ -141,7 +193,7 @@ void fa::GUI::DrawCanvas() {
     constexpr ImU32 grid_color = IM_COL32(30, 30, 30, 255);
 
     for (int x = 0; x <= fa::ApplicationContext::canvas_width; x++) {
-        float line_x = canvas_screen_position.x + static_cast<float>(x) * canvas_scale;
+        float line_x = canvas_screen_position.x + static_cast<float>(x) * pixel_size;
 
         draw_list->AddLine(ImVec2(line_x, canvas_screen_position.y),
                            ImVec2(line_x, canvas_screen_position.y + canvas_size.y),
@@ -149,7 +201,7 @@ void fa::GUI::DrawCanvas() {
     }
 
     for (int y = 0; y <= fa::ApplicationContext::canvas_height; y++) {
-        float line_y = canvas_screen_position.y + static_cast<float>(y) * canvas_scale;
+        float line_y = canvas_screen_position.y + static_cast<float>(y) * pixel_size;
 
         draw_list->AddLine(ImVec2(canvas_screen_position.x, line_y),
                            ImVec2(canvas_screen_position.x + canvas_size.x, line_y),
@@ -184,7 +236,7 @@ void fa::GUI::DrawCanvas() {
 
     // brush preview
     if (is_mouse_inside_canvas) {
-        float visual_radius = static_cast<float>(m_Context.brush_size) * canvas_scale;
+        float visual_radius = static_cast<float>(m_Context.brush_size) * pixel_size;
         draw_list->AddCircle(mouse_position, visual_radius, IM_COL32(255, 255, 0, 180), 16, 2.0f);
     }
 
@@ -193,8 +245,8 @@ void fa::GUI::DrawCanvas() {
                       ImGui::IsMouseDown(ImGuiMouseButton_Right);
 
     if (is_mouse_inside_canvas && is_drawing) {
-        int canvas_x = static_cast<int>((mouse_position.x - canvas_screen_position.x) / canvas_scale);
-        int canvas_y = static_cast<int>((mouse_position.y - canvas_screen_position.y) / canvas_scale);
+        int canvas_x = static_cast<int>((mouse_position.x - canvas_screen_position.x) / pixel_size);
+        int canvas_y = static_cast<int>((mouse_position.y - canvas_screen_position.y) / pixel_size);
 
         float target_value = ImGui::IsMouseDown(ImGuiMouseButton_Left) ? 1.0f : 0.0f;
 
@@ -232,11 +284,18 @@ void fa::GUI::DrawCanvas() {
 
 void fa::GUI::DrawPredictions() {
     constexpr static ImGuiWindowFlags static_window_flags = ImGuiWindowFlags_NoMove |
-                                                            ImGuiWindowFlags_NoResize |
-                                                            ImGuiWindowFlags_NoCollapse;
+                                                            ImGuiWindowFlags_NoCollapse |
+                                                            ImGuiWindowFlags_NoScrollbar;
 
-    ImGui::SetNextWindowPos(ImVec2(450, 20));
-    ImGui::SetNextWindowSize(ImVec2(190, 460));
+    ImVec2 display_size    = ImGui::GetIO().DisplaySize;
+    float  menu_bar_height = ImGui::GetFrameHeight();
+    float  output_width    = display_size.x * 0.3f;
+    float  canvas_width    = display_size.x - output_width;
+    float  content_height  = display_size.y - menu_bar_height;
+
+    ImGui::SetNextWindowPos(ImVec2(canvas_width, menu_bar_height));
+    ImGui::SetNextWindowSize(ImVec2(output_width, content_height));
+
     ImGui::Begin("Output", nullptr, static_window_flags);
 
     int answer = (int) fa::classify(m_Context.current_predictions);

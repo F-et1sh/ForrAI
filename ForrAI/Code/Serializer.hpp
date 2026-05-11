@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include "Perceptron.hpp"
+#include "misc.hpp"
 
 namespace fa {
     class Serializer {
@@ -10,9 +11,12 @@ namespace fa {
         Serializer(Perceptron& perceptron) : m_Perceptron(perceptron) {}
         ~Serializer() = default;
 
-        void Write(const std::filesystem::path& path) {
+        void Write(const std::filesystem::path& path, ApplicationContext& context) {
             std::ofstream file(path, std::ios::binary);
-            if (!file.good()) assert(false);
+            if (!file.good()) {
+                reportError(context, std::string("Failed to serialize perceptron. Failed to open the file\nPath : ") + path.string());
+                return;
+            }
 
             write_variable(file, m_Perceptron.GetLayerValues());
             write_variable(file, m_Perceptron.GetLayerBiases());
@@ -25,9 +29,13 @@ namespace fa {
             write_variable(file, m_Perceptron.GetLayersTopology());
         }
 
-        void Read(const std::filesystem::path& path) {
+        void Read(const std::filesystem::path& path, ApplicationContext& context) {
             std::ifstream file(path, std::ios::binary);
-            if (!file.good()) assert(false);
+            if (!file.good()) {
+                reportError(context, std::string("Failed to deserialize perceptron. Failed to open the file\nPath : ") + path.string());
+                return;
+            }
+            file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
             fa::container_t<fa::neuron_value_t> layer_values{};
             fa::container_t<fa::neuron_value_t> layer_biases{};
@@ -40,15 +48,20 @@ namespace fa {
 
             std::vector<fa::Perceptron::Layer> layers_topology{};
 
-            read_variable(file, layer_values);
-            read_variable(file, layer_biases);
-            read_variable(file, layer_grad_biases);
-            read_variable(file, layer_velocity_biases);
-            read_variable(file, layer_deltas);
-            read_variable(file, layer_weights);
-            read_variable(file, layer_grad_weights);
-            read_variable(file, layer_velocity_weights);
-            read_variable(file, layers_topology);
+            try {
+                read_variable(file, layer_values);
+                read_variable(file, layer_biases);
+                read_variable(file, layer_grad_biases);
+                read_variable(file, layer_velocity_biases);
+                read_variable(file, layer_deltas);
+                read_variable(file, layer_weights);
+                read_variable(file, layer_grad_weights);
+                read_variable(file, layer_velocity_weights);
+                read_variable(file, layers_topology);
+            }
+            catch (const std::exception& e) {
+                reportError(context, std::string("Failed to deserialize perceptron. ") + e.what());
+            }
 
             m_Perceptron = fa::Perceptron{ layer_values,
                                            layer_biases,
@@ -72,9 +85,13 @@ namespace fa {
         template <template <typename...> class Container, typename Element>
         static void read_variable(std::ifstream& file, Container<Element>& vec) {
             std::size_t size{};
-            file.read(reinterpret_cast<char*>(&size), sizeof(size));
+            if (!file.read(reinterpret_cast<char*>(&size), sizeof(size))) return;
+
+            if (size > 100'000'000) throw std::runtime_error("Too much data\nMost likely wrong format");
+
             vec.resize(size);
-            file.read(reinterpret_cast<char*>(vec.data()), size * sizeof(Element));
+            if (size > 0)
+                file.read(reinterpret_cast<char*>(vec.data()), size * sizeof(Element));
         }
 
     private:

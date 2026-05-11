@@ -19,8 +19,10 @@ namespace fa {
 
         std::array<float, 10> current_predictions{};
 
-        std::string           error_message{}; // drawing this if not empty
-        std::filesystem::path path_to_file{};  // using this to write or read if flags ( is_reading/is_writing ) are active
+        std::string error_message{};         // don't use this directly, use reportError(...) instead
+        float       error_displaying_time{}; // don't use this directly, use reportError(...) instead
+
+        std::filesystem::path path_to_file{}; // using this to write or read if flags ( is_reading/is_writing ) are active
 
         constexpr static std::uint8_t                            canvas_width  = 28;
         constexpr static std::uint8_t                            canvas_height = 28;
@@ -33,6 +35,11 @@ namespace fa {
         ApplicationContext()  = default;
         ~ApplicationContext() = default;
     };
+
+    static void reportError(ApplicationContext& contxt, const std::string& message) {
+        contxt.error_message         = message;
+        contxt.error_displaying_time = 6.0f;
+    }
 
     static std::size_t classify(const std::array<neuron_value_t, 10>& predictions) {
         std::size_t    result = 0;

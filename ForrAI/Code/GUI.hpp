@@ -31,6 +31,7 @@ namespace fa {
     private:
         void updateCanvasTexture();
         void applyBrush(int center_x, int center_y, float target_value);
+
         std::optional<std::filesystem::path> openFile() const;
 
         bool isPixelInsideCanvas(int pixel_x, int pixel_y) const;
