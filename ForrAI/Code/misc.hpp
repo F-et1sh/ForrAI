@@ -22,14 +22,14 @@ namespace fa {
         std::string error_message{};         // don't use this directly, use reportError(...) instead
         float       error_displaying_time{}; // don't use this directly, use reportError(...) instead
 
-        std::filesystem::path path_to_file{}; // using this to write or read if flags ( is_reading/is_writing ) are active
+        std::filesystem::path path_to_file = "ForrAI-final.bin"; // using this to write or read if flags ( is_reading/is_writing ) are active
 
         constexpr static std::uint8_t                            canvas_width  = 28;
         constexpr static std::uint8_t                            canvas_height = 28;
         std::array<neuron_value_t, canvas_width * canvas_height> canvas_pixels{};
 
         bool is_canvas_dirty = false;
-        bool is_reading      = false;
+        bool is_reading      = true; // load a model at the begining
         bool is_writing      = false;
 
         ApplicationContext()  = default;

@@ -132,25 +132,27 @@ void fa::GUI::Update() {
 void fa::GUI::DrawMainMenuBar() {
     if (!ImGui::BeginMainMenuBar()) return;
 
-    if (!ImGui::BeginMenu("File")) {
-        ImGui::EndMainMenuBar();
-        return;
-    }
+    if (ImGui::BeginMenu("File")) {
 
-    //if (ImGui::MenuItem("Save")) {
-    //}
+        //if (ImGui::MenuItem("Save")) {
+        //}
 
-    if (ImGui::MenuItem("Load")) {
+        if (ImGui::MenuItem("Load")) {
 
-        auto path = this->openFile();
+            auto path = this->openFile();
 
-        if (path.has_value()) {
-            m_Context.path_to_file = path.value();
-            m_Context.is_reading   = true;
+            if (path.has_value()) {
+                m_Context.path_to_file = path.value();
+                m_Context.is_reading   = true;
+            }
         }
-    }
 
-    ImGui::EndMenu();
+        ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("About")) {
+        ImGui::Text("Forr-AI 1.0v\nMay 2026\n© 2026 Farrakh Fattakhov.");
+        ImGui::EndMenu();
+    }
 
     ImGui::EndMainMenuBar();
 }
