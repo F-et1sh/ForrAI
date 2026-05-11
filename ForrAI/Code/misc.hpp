@@ -11,9 +11,9 @@ namespace fa {
 
     struct ApplicationContext {
     public:
-        constexpr static int brush_min_size = 2;
+        constexpr static int brush_min_size = 1;
         constexpr static int brush_max_size = 10;
-        int                  brush_size     = 2;
+        int                  brush_size     = 1;
 
         std::filesystem::path font_path = "Files/Fonts/OpenSans/open_sans.ttf";
 

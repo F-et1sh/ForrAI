@@ -361,33 +361,36 @@ void fa::GUI::updateCanvasTexture() {
 }
 
 void fa::GUI::applyBrush(int center_x, int center_y, float target_value) {
-    int   brush_radius         = m_Context.brush_size;
-    float brush_radius_squared = static_cast<float>(brush_radius * brush_radius);
+    float radius = m_Context.brush_size;
+    if (radius <= 0.0f) return;
 
-    for (int offset_y = -brush_radius; offset_y <= brush_radius; offset_y++) {
-        for (int offset_x = -brush_radius; offset_x <= brush_radius; offset_x++) {
+    int range = static_cast<int>(std::ceil(radius));
+
+    for (int offset_y = -range; offset_y <= range; offset_y++) {
+        for (int offset_x = -range; offset_x <= range; offset_x++) {
 
             int pixel_x = center_x + offset_x;
             int pixel_y = center_y + offset_y;
 
             if (!this->isPixelInsideCanvas(pixel_x, pixel_y)) continue;
 
-            float distance_squared = static_cast<float>(offset_x * offset_x + offset_y * offset_y);
-            if (distance_squared > brush_radius_squared) continue;
+            float distance = std::sqrt(static_cast<float>(offset_x * offset_x + offset_y * offset_y));
+            
+            float edge_softness = 1.0f; 
+            float opacity = std::clamp((radius - distance) / edge_softness + 0.5f, 0.0f, 1.0f);
 
-            float normalized_distance_squared = distance_squared / brush_radius_squared;
+            if (opacity <= 0.0f) continue;
 
-            float opacity = 1.0f - normalized_distance_squared;
-            opacity *= opacity;
+            float final_opacity = opacity * opacity;
 
-            std::size_t pixel_index = pixel_y * fa::ApplicationContext::canvas_width + pixel_x;
-
+            std::size_t pixel_index = static_cast<std::size_t>(pixel_y) * fa::ApplicationContext::canvas_width + pixel_x;
             auto& pixel = m_Context.canvas_pixels[pixel_index];
-            pixel       = std::lerp(pixel, target_value, opacity);
+            
+            pixel = std::lerp(pixel, target_value, final_opacity);
         }
     }
 
-    m_IsCanvasTextureDirty    = true;
+    m_IsCanvasTextureDirty = true;
     m_Context.is_canvas_dirty = true;
 }
 
