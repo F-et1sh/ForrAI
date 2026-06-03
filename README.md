@@ -23,7 +23,7 @@ Original code : https://github.com/githubharald/cpp_mnist
 - C++23
 - SFML
 - Dear ImGui
-- OpenMP ( disable in the release version )
+- OpenMP ( disabled in the release version )
 
 ## Licenses
 
