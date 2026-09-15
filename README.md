@@ -27,11 +27,9 @@ Original code : https://github.com/githubharald/cpp_mnist
 
 ## Licenses
 
-This project is **not open-source**.  
-For detailed information about usage restrictions, see [`LICENSE.txt`](./LICENSE.txt).
-
+This project is under MIT License.\
 Licenses for third-party libraries used in this project are included in the `build` directory next to the executable ( `.exe` ).
 
 ---
 
-© 2026 Farrakh Fattakhov. All rights reserved.
+© 2026 Farrah Fattah. All rights reserved.
